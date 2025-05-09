@@ -1,0 +1,863 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>욕실 견적서 프로그램</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+    }
+
+    .category, .estimate, .items {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .category {
+      flex: 0 0 220px;
+      max-height: 100vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 20px;
+    }
+
+    .items {
+      flex: 1 1 700px;
+      max-width: 1000px;
+    }
+
+    .estimate {
+      flex: 0 0 280px;
+      position: sticky;
+      top: 20px;
+    }
+
+    h3 {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .main-category {
+      font-size: 15px;
+      color: #222;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+      margin-top: 20px;
+    }
+
+    .sub-category {
+      list-style: none;
+      padding-left: 15px;
+      margin-top: 5px;
+    }
+
+    .sub-category li {
+      font-size: 14px;
+      color: #0077cc;
+      margin: 4px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sub-category li:hover {
+      color: #005299;
+      text-decoration: underline;
+    }
+
+    .items #items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .item {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.2s;
+position: relative;
+    }
+
+    .item:hover {
+      transform: translateY(-3px);
+    }
+
+    .item img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .item .name {
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 4px;
+      color: #222;
+    }
+
+    .item .price {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .item .control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .item .control input[type="number"] {
+      width: 32px;
+      height: 28px;
+      font-size: 13px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .item .control button {
+      height: 28px;
+      padding: 0 10px;
+      font-size: 13px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .sort-box {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+
+    .estimate ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .estimate-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .estimate-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    .estimate-item .info-line {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .estimate-item .info-line div:first-child {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .estimate-item .info-line div:last-child {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .price-delete {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price-delete span {
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .delete-btn:hover {
+      color: red;
+    }
+
+    .admin {
+      display: none;
+      background-color: #f9f9f9;
+      width: 90%;
+      margin: 30px auto 0;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      color: #333;
+      font-size: 13px;
+      border-radius: 5px;
+      padding: 5px 10px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #e0e0e0;
+    }
+
+    textarea {
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-family: inherit;
+      resize: none;
+    }
+
+    #imageModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #imageModal img {
+      max-width: 700px;
+      max-height: 700px;
+      width: 100%;
+      height: auto;
+      border: 5px solid #fff;
+      border-radius: 10px;
+    }
+
+    #imageModal button {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 24px;
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+#prevBtn, #nextBtn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+  padding: 0;
+  margin: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#prevBtn {
+  left: 10px;
+}
+
+#nextBtn {
+  right: 10px;
+}
+.best-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: orange;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.basic-badge {
+  position: absolute;
+  top: 8px;
+  left: 56px; /* BEST 배지 오른쪽 */
+  background: #3ca7ff; /* 차분한 파란색 */
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+  </style>
+</head>
+<body>
+  <div style="display: flex; gap: 20px; padding: 20px;">
+    <div class="category">
+      <h3>자재 카테고리</h3>
+      <button onclick="toggleAdmin()">🔧 관리자 모드</button>
+      <hr />
+      <div class="main-category">장 · 거울</div>
+      <ul class="sub-category">
+        <li onclick="selectCategory('상 · 하단장')">상 · 하단장</li>
+        <li onclick="selectCategory('욕실장')">욕실장</li>
+        <li onclick="selectCategory('슬라이드장')">슬라이드장</li>
+        <li onclick="selectCategory('플랩장')">플랩장</li>
+        <li onclick="selectCategory('거울')">거울</li>
+        <li onclick="selectCategory('하부장')">하부장</li>
+      </ul>
+
+      <div class="main-category">도기</div>
+      <ul class="sub-category">
+        <li onclick="selectCategory('세면기')">세면기</li>
+        <li onclick="selectCategory('양변기(원피스)')">양변기(원피스)</li>
+        <li onclick="selectCategory('양변기(투피스)')">양변기(투피스)</li>
+        <li onclick="selectCategory('탑볼')">탑볼</li>
+      </ul>
+
+      <div class="main-category">수전</div>
+      <ul class="sub-category">
+        <li onclick="selectCategory('세면수전')">세면수전</li>
+        <li onclick="selectCategory('샤워기')">샤워기</li>
+        <li onclick="selectCategory('해바라기')">해바라기</li>
+        <li onclick="selectCategory('탑볼수전')">탑볼수전</li>
+      </ul>
+
+      <div class="main-category">악세사리</div>
+<ul class="sub-category">
+  <li onclick="selectCategory('수건걸이')">수건걸이</li>
+  <li onclick="selectCategory('슬라이드바')">슬라이드바</li>
+  <li onclick="selectCategory('휴지걸이')">휴지걸이</li>
+  <li onclick="selectCategory('코너선반')">코너선반</li>
+  <li onclick="selectCategory('대리석')">대리석</li>
+  <li onclick="selectCategory('스프레이건')">스프레이건</li>
+</ul>
+
+<div class="main-category">기타</div>
+<ul class="sub-category">
+  <li onclick="selectCategory('타일')">타일</li>
+  <li onclick="selectCategory('욕조')">욕조</li>
+  <li onclick="selectCategory('파티션')">파티션</li>
+  <li onclick="selectCategory('천장')">천장</li>
+</ul>
+
+<hr style="margin: 10px 0;" />
+
+<ul class="sub-category">
+  <li onclick="selectCategory('시공비')">시공비</li>
+  <li onclick="selectCategory('별도 시공비')">별도 시공비</li>
+</ul>
+
+<hr style="margin: 10px 0;" />
+
+<ul class="sub-category">
+  <li onclick="selectCategory('세트')">세트</li>
+</ul>
+    </div>
+
+    <div class="items">
+      <h3>자재 목록</h3>
+      <div class="sort-box">
+        정렬:
+        <select onchange="sortMaterials(this.value)">
+          <option value="">기본순</option>
+          <option value="name">이름순</option>
+          <option value="price">가격순</option>
+        </select>
+      </div>
+      <div id="addAllSetButton" style="display:none; text-align:right; margin-bottom:10px;">
+        <button onclick="addAllFromSet()">모두 추가</button>
+      </div>
+      <div id="items"></div>
+    </div>
+
+    <div class="estimate">
+      <h3>견적서</h3>
+      <ul id="selectedItems"></ul>
+      <p><strong>총액: </strong><span id="totalPrice">0</span>원</p>
+      <button onclick="summarizeEstimate()">정리</button>
+      <textarea id="summaryText" style="width:100%; height:100px; margin-top:10px;"></textarea>
+    </div>
+  </div> <!-- end of flex layout -->
+
+  <div id="imageModal" onclick="closeModal(event)">
+<div id="imageWrapper" style="position: relative; display: inline-block;">
+  <img id="modalImage" src="" />
+</div>
+<!-- 화살표는 모달 밖에서 고정 위치로 -->
+<button id="prevBtn">←</button>
+<button id="nextBtn">→</button>
+  </div>
+
+  <script>
+  const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyTujt87IIM_QenEbo9kUyVSLiIkvoj95wSJ8lbL5XfU0wDY-6MD1p3kx7J5a1XJRga/exec";
+  let materials = {};
+  let selected = [];
+  let currentCategory = "";
+  let currentSort = "";
+  let isAdminMode = false;
+
+  async function fetchMaterials() {
+    const res = await fetch(SHEETS_API_URL);
+    const data = await res.json();
+    materials = {};
+    data.forEach(item => {
+      if (!materials[item.category]) materials[item.category] = [];
+materials[item.category].push({
+  name: item.name,
+  price: parseInt(item.price),
+  img1: item.img1 || item.img,
+  img2: item.img2 || item.img,
+ isBest: item.isBest?.toString().toUpperCase() === "TRUE",
+  isBasic: item.isBasic?.toString().toUpperCase() === "TRUE"
+});
+    });
+    if (currentCategory) showItems(currentCategory);
+  }
+
+  function selectCategory(category) {
+    currentCategory = category;
+    document.getElementById('currentCategoryText').innerText = category;
+    document.getElementById('addAllSetButton').style.display = (category === '세트') ? 'block' : 'none';
+    showItems(category);
+  }
+
+  function showItems(category) {
+    const container = document.getElementById('items');
+    container.innerHTML = '';
+    let items = materials[category] ? [...materials[category]] : [];
+
+    if (currentSort === 'name') {
+      items.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    } else if (currentSort === 'price') {
+      items.sort((a, b) => a.price - b.price);
+    }
+items.sort((a, b) => {
+    if (a.isBest && !b.isBest) return -1;
+    if (!a.isBest && b.isBest) return 1;
+    return 0;
+  });
+
+    items.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+  ${item.isBest ? `<div class="best-badge">BEST</div>` : ""}
+${item.isBasic ? `<div class="basic-badge">기본형</div>` : ""}
+  <img src="${item.img1}" onclick="openModal('${item.img1}', '${item.img2}')">
+  <div class="name">${item.name}</div>
+  <div class="price">
+    <span id="item-price-${i}">${item.price.toLocaleString()}원</span>
+    ${isAdminMode ? `<button onclick="editItemPrice(${i})">✎</button>` : ""}
+  </div>
+  <div class="control">
+    <input type="number" min="1" value="1" id="qty-${item.name}">
+    <button onclick="addToEstimate('${category}', '${item.name}')">추가</button>
+  </div>
+${isAdminMode ? `
+  ${item.isBest
+    ? `<button class="best-btn" onclick="unmarkAsBest('${category}', '${item.name}')">BEST 삭제</button>`
+    : `<button class="best-btn" onclick="markAsBest('${category}', '${item.name}')">BEST 추가</button>`}
+  ${item.isBasic
+    ? `<button class="best-btn" onclick="unmarkAsBasic('${category}', '${item.name}')">기본형 삭제</button>`
+    : `<button class="best-btn" onclick="markAsBasic('${category}', '${item.name}')">기본형 추가</button>`}
+` : ""}
+`;
+      container.appendChild(div);
+    });
+  }
+
+  function sortMaterials(type) {
+    currentSort = type;
+    if (currentCategory) showItems(currentCategory);
+  }
+
+  function addToEstimate(category, name) {
+    const item = materials[category].find(i => i.name === name);
+    const qtyInput = document.getElementById(`qty-${item.name}`);
+    const qty = parseInt(qtyInput.value);
+
+    if (isNaN(qty) || qty <= 0) {
+      alert("수량을 입력하세요");
+      return;
+    }
+
+    const existing = selected.find(i => i.name === item.name);
+    if (existing) {
+      existing.quantity += qty;
+    } else {
+      selected.push({ ...item, quantity: qty, category });
+    }
+
+    renderEstimate();
+  }
+
+  function addAllFromSet() {
+    const items = materials[currentCategory] || [];
+    items.forEach(item => {
+      selected.push({ ...item, quantity: 1, category: currentCategory });
+    });
+    renderEstimate();
+  }
+
+  function renderEstimate() {
+    const list = document.getElementById('selectedItems');
+    list.innerHTML = '';
+    selected.forEach((item, i) => {
+      const nameOnly = item.name.split("(")[0];
+      const code = item.name.match(/\((.*?)\)/)?.[1] || '';
+      list.innerHTML += `
+        <li class="estimate-item">
+          <img src="${item.img1}" onclick="openModal('${item.img1}', '${item.img2}')">
+          <div class="info-line">
+            <div>${nameOnly}</div>
+            <div>${code} x ${item.quantity}</div>
+          </div>
+          <div class="price-delete">
+            <span>${(item.price * item.quantity).toLocaleString()}원</span>
+            <button class="delete-btn" onclick="removeItem(${i})">✕</button>
+          </div>
+        </li>
+      `;
+    });
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const total = selected.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    document.getElementById('totalPrice').textContent = total.toLocaleString();
+  }
+
+  function summarizeEstimate() {
+  const countMap = {};
+  selected.forEach(item => {
+    if (item.category === "시공비") return; // 시공비는 정리에서 제외
+    if (!countMap[item.name]) countMap[item.name] = 0;
+    countMap[item.name] += item.quantity;
+  });
+    const summaryParts = Object.entries(countMap).map(([name, qty]) =>
+      qty > 1 ? `${name} ${qty}EA` : name
+    );
+    summaryParts.push("다운라이트 2EA");
+    document.getElementById("summaryText").value = summaryParts.join(", ");
+  }
+
+  function removeItem(index) {
+    selected.splice(index, 1);
+    renderEstimate();
+  }
+
+  function toggleAdmin() {
+    const pw = prompt("관리자 비밀번호를 입력하세요:");
+    if (pw === "1760") {
+      isAdminMode = true;
+      document.getElementById('adminPanel').style.display = 'block';
+      if (currentCategory) showItems(currentCategory);
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
+  }
+
+  function closeAdmin() {
+    isAdminMode = false;
+    document.getElementById('adminPanel').style.display = 'none';
+    if (currentCategory) showItems(currentCategory);
+  }
+
+  function editItemPrice(index) {
+    const span = document.getElementById(`item-price-${index}`);
+    const item = materials[currentCategory][index];
+    span.innerHTML = `
+      <input type="number" id="new-price-${index}" value="${item.price}" style="width:70px">
+      <button onclick="saveItemPrice(${index})">저장</button>
+    `;
+  }
+
+function editItemPrice(index) {
+  const span = document.getElementById(`item-price-${index}`);
+  const name = span.closest('.item').querySelector('.name').textContent;
+  span.innerHTML = `
+    <input type="number" id="new-price-${index}" value="" style="width:70px">
+    <button onclick="saveItemPrice('${name}', ${index})">저장</button>
+  `;
+
+  const item = findItemByName(currentCategory, name);
+  if (item) {
+    document.getElementById(`new-price-${index}`).value = item.price;
+  }
+}
+
+function saveItemPrice(name, index) {
+  const input = document.getElementById(`new-price-${index}`);
+  const newPrice = parseInt(input.value);
+  const item = findItemByName(currentCategory, name);
+
+  if (!isNaN(newPrice) && newPrice > 0 && item) {
+    item.price = newPrice;
+
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: currentCategory,
+        name: item.name,
+        price: newPrice,
+        img1: item.img1,
+        img2: item.img2
+      }),
+      mode: "no-cors"
+    })
+    .then(() => {
+      alert("가격이 수정 요청되었습니다!");
+      fetchMaterials();
+    })
+    .catch(() => {
+      alert("가격 수정 실패!");
+    });
+
+    showItems(currentCategory);
+  } else {
+    alert("올바른 가격을 입력해주세요.");
+  }
+}
+
+function findItemByName(category, name) {
+  return (materials[category] || []).find(i => i.name === name);
+}
+
+  function addMaterial() {
+    const name = document.getElementById("adminName").value;
+    const price = parseInt(document.getElementById("adminPrice").value);
+    const file1 = document.getElementById("adminImgFile1").files[0];
+    const file2 = document.getElementById("adminImgFile2").files[0];
+
+    if (!name || !price || !file1 || !currentCategory) {
+      alert("필수 항목을 모두 입력해주세요! (이미지1은 필수)");
+      return;
+    }
+
+    const reader1 = new FileReader();
+    const reader2 = new FileReader();
+
+    reader1.onload = function (e1) {
+      const img1 = e1.target.result;
+
+      if (!file2) {
+        const img2 = img1;
+        submitMaterial(img1, img2);
+      } else {
+        reader2.onload = function (e2) {
+          const img2 = e2.target.result;
+          submitMaterial(img1, img2);
+        };
+        reader2.readAsDataURL(file2);
+      }
+    };
+    reader1.readAsDataURL(file1);
+  }
+
+  function submitMaterial(img1, img2) {
+    const name = document.getElementById("adminName").value;
+    const price = parseInt(document.getElementById("adminPrice").value);
+
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: currentCategory, name, price, img1, img2 }),
+      mode: "no-cors"
+    }).then(() => {
+      alert("자재가 성공적으로 추가되었습니다!");
+      document.getElementById("adminName").value = "";
+      document.getElementById("adminPrice").value = "";
+      document.getElementById("adminImgFile1").value = "";
+      document.getElementById("adminImgFile2").value = "";
+      fetchMaterials().then(() => showItems(currentCategory));
+    });
+  }
+
+  function closeModal(event) {
+    if (event.target.id === 'imageModal' || event.target.tagName === 'BUTTON') {
+      document.getElementById('imageModal').style.display = 'none';
+      document.getElementById('modalImage').src = '';
+    modalImages = [];
+    modalIndex = 0;
+    }
+  }
+
+  window.onload = fetchMaterials;
+  let modalImages = [];
+  let modalIndex = 0;
+
+  function openModal(img1, img2) {
+    if (!img2 || img2 === "undefined") img2 = img1;
+    modalImages = [img1, img2];
+    modalIndex = 0;
+    showModalImage();
+    document.getElementById('imageModal').style.display = 'flex';
+// 화살표 클릭 이벤트 연결
+  document.getElementById('prevBtn').onclick = (e) => {
+    e.stopPropagation();
+    modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length;
+    showModalImage();
+  };
+
+  document.getElementById('nextBtn').onclick = (e) => {
+    e.stopPropagation();
+    modalIndex = (modalIndex + 1) % modalImages.length;
+    showModalImage();
+  };
+  }
+
+  function showModalImage() {
+    document.getElementById('modalImage').src = modalImages[modalIndex];
+  }
+
+function markAsBest(category, name) {
+  const item = materials[category].find(i => i.name === name);
+  if (!item) return;
+
+  item.isBest = true; // 로컬 상태 먼저 반영
+
+  fetch(SHEETS_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      category,
+      name,
+      price: item.price,
+      img1: item.img1,
+      img2: item.img2,
+      isBest: true // Google Sheet에 TRUE로 저장
+    }),
+    mode: "no-cors"
+  }).then(() => {
+    alert("BEST로 등록되었습니다!");
+    fetchMaterials().then(() => showItems(currentCategory)); // 최신 데이터 반영
+  });
+}
+function unmarkAsBest(category, name) {
+  const item = materials[category].find(i => i.name === name);
+  if (!item) return;
+
+  item.isBest = false;
+
+  fetch(SHEETS_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      category,
+      name,
+      price: item.price,
+      img1: item.img1,
+      img2: item.img2,
+      isBest: false
+    }),
+    mode: "no-cors"
+  }).then(() => {
+    alert("BEST가 해제되었습니다!");
+    fetchMaterials().then(() => showItems(currentCategory));
+  });
+}
+function markAsBasic(category, name) {
+  const item = materials[category].find(i => i.name === name);
+  if (!item) return;
+
+  item.isBasic = true;
+
+  fetch(SHEETS_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      category,
+      name,
+      price: item.price,
+      img1: item.img1,
+      img2: item.img2,
+      isBasic: true
+    }),
+    mode: "no-cors"
+  }).then(() => {
+    alert("기본형으로 등록되었습니다!");
+    fetchMaterials().then(() => showItems(currentCategory));
+  });
+}
+
+function unmarkAsBasic(category, name) {
+  const item = materials[category].find(i => i.name === name);
+  if (!item) return;
+
+  item.isBasic = false;
+
+  fetch(SHEETS_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      category,
+      name,
+      price: item.price,
+      img1: item.img1,
+      img2: item.img2,
+      isBasic: false
+    }),
+    mode: "no-cors"
+  }).then(() => {
+    alert("기본형이 해제되었습니다!");
+    fetchMaterials().then(() => showItems(currentCategory));
+  });
+}
+
+  </script>
+
+  <div class="admin" id="adminPanel">
+    <h3>🔧 관리자 모드</h3>
+    <label>현재 카테고리: <span id="currentCategoryText">-</span></label>
+    <label>자재 이름: <input type="text" id="adminName" /></label>
+    <label>가격: <input type="number" id="adminPrice" /></label>
+    <label>이미지 1: <input type="file" id="adminImgFile1" accept="image/*" /></label>
+    <label>이미지 2: <input type="file" id="adminImgFile2" accept="image/*" /></label>
+    <button onclick="addMaterial()">자재 추가하기</button>
+    <button onclick="closeAdmin()">관리자 모드 닫기</button>
+  </div>
+
+</body>
+</html>
