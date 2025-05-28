@@ -256,6 +256,45 @@ max-width: 300px;
   border-radius: 4px;
   z-index: 2;
 }
+
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel.left {
+    width: 100%;
+    order: 1;
+  }
+
+  .flex-row {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 12px;
+    order: 2;
+    overflow-x: auto;
+  }
+
+  .panel[data-panel="upper"],
+  .panel[data-panel="lower"],
+  #artificialTopSection,
+  .panel[id^="customEtcPanel"],
+  #customKeyPanel,
+  #customFridgePanel {
+    flex: 0 0 50%;
+    min-width: 320px;
+  }
+
+  .panel.right {
+    width: 100%;
+    order: 3;
+  }
+
+  .material-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
   </style>
 </head>
 <body>
