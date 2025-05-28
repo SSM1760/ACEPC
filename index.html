@@ -1,863 +1,1823 @@
 
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>욕실 견적서 프로그램</title>
+  <title>싱크대 견적서</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f8;
       margin: 0;
+      padding: 20px;
     }
 
-    .category, .estimate, .items {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    .container {
+      display: flex;
+      gap: 20px;
     }
 
-    .category {
-      flex: 0 0 220px;
-      max-height: 100vh;
-      overflow-y: auto;
-      position: sticky;
-      top: 20px;
-    }
-
-    .items {
-      flex: 1 1 700px;
-      max-width: 1000px;
-    }
-
-    .estimate {
-      flex: 0 0 280px;
-      position: sticky;
-      top: 20px;
-    }
-
-    h3 {
-      text-align: center;
-      font-size: 18px;
-      margin-bottom: 12px;
-    }
-
-    .main-category {
-      font-size: 15px;
-      color: #222;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 4px;
-      margin-top: 20px;
-    }
-
-    .sub-category {
-      list-style: none;
-      padding-left: 15px;
-      margin-top: 5px;
-    }
-
-    .sub-category li {
-      font-size: 14px;
-      color: #0077cc;
-      margin: 4px 0;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sub-category li:hover {
-      color: #005299;
-      text-decoration: underline;
-    }
-
-    .items #items {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .item {
+    .panel {
+      background-color: #fff;
       border: 1px solid #ddd;
       border-radius: 12px;
-      padding: 14px;
-      background: #fff;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: transform 0.2s;
-position: relative;
-    }
-
-    .item:hover {
-      transform: translateY(-3px);
-    }
-
-    .item img {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .item .name {
-      font-weight: bold;
-      font-size: 15px;
-      margin-top: 4px;
-      color: #222;
-    }
-
-    .item .price {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .item .control {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .item .control input[type="number"] {
-      width: 32px;
-      height: 28px;
-      font-size: 13px;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .item .control button {
-      height: 28px;
-      padding: 0 10px;
-      font-size: 13px;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .sort-box {
-      text-align: right;
-      margin-bottom: 10px;
-    }
-
-    .estimate ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .estimate-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .estimate-item img {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-right: 10px;
-    }
-
-    .estimate-item .info-line {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .estimate-item .info-line div:first-child {
-      font-weight: bold;
-      font-size: 15px;
-    }
-
-    .estimate-item .info-line div:last-child {
-      font-size: 12px;
-      color: #666;
-      margin-top: 2px;
-    }
-
-    .price-delete {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .price-delete span {
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #999;
-      font-size: 14px;
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .delete-btn:hover {
-      color: red;
-    }
-
-    .admin {
-      display: none;
-      background-color: #f9f9f9;
-      width: 90%;
-      margin: 30px auto 0;
       padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      min-height: 600px;
     }
 
-    label {
+   .left {
+  width: 220px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  flex-wrap: nowrap; /* ✅ 줄바꿈 방지 */
+}
+
+#upperForm, #lowerForm {
+  flex: 1;
+  min-width: 0; /* ✅ flex 요소 줄바꿈 방지 */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.right {
+  width: 300px;
+}
+
+h3 {
+  text-align: center;
+  margin-top: 0;
+}
+
+    .admin-button {
       display: block;
-      margin-top: 10px;
-    }
-
-    button {
-      margin-top: 10px;
-      background-color: #f5f5f5;
-      border: 1px solid #ccc;
-      color: #333;
-      font-size: 13px;
-      border-radius: 5px;
-      padding: 5px 10px;
-      transition: background 0.2s;
-    }
-
-    button:hover {
-      background-color: #e0e0e0;
-    }
-
-    textarea {
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      padding: 8px;
-      font-family: inherit;
-      resize: none;
-    }
-
-    #imageModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #imageModal img {
-      max-width: 700px;
-      max-height: 700px;
       width: 100%;
-      height: auto;
-      border: 5px solid #fff;
-      border-radius: 10px;
-    }
-
-    #imageModal button {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 24px;
-      background: none;
-      color: white;
-      border: none;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 20px;
       cursor: pointer;
     }
 
-#prevBtn, #nextBtn {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 60px;
-  color: white;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 1001;
-  padding: 0;
-  margin: 0;
-  width: 60px;
-  height: 60px;
+    .category-group { margin-bottom: 20px; }
+    .category-title { font-weight: bold; margin-bottom: 6px; }
+
+    .category-item {
+      display: inline-block;
+      background-color: #eef2f7;
+      padding: 6px 10px;
+      margin: 4px 4px 0 0;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .section { width: 100%; margin-bottom: 20px; display: none; }
+    .radio-group label { display: block; margin-bottom: 8px; font-size: 16px; }
+
+    .size-inputs {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .size-inputs input {
+      width: 100px;
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    #unitPriceInput, #saveUnitBtn {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .add-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .add-button:hover { background-color: #555; }
+
+    .admin-panel {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #fafafa;
+      font-size: 14px;
+    }
+
+    .admin-panel input[type="text"],
+    .admin-panel input[type="number"] {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    .admin-panel input[type="file"] {
+      margin-bottom: 8px;
+    }
+
+    .admin-panel button {
+      padding: 6px 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #estimateList {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+#upperForm, #lowerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#artificialTopSection.full-width {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 !important;
+    gap: 20px;
+  }
+.material-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.material-grid.small {
+  grid-template-columns: repeat(2, 1fr);  /* ✅ 2개씩 */
+}
+
+.material-card {
+  position: relative; /* ✅ BEST 라벨을 내부에 고정시키기 위해 필요 */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.material-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: contain;
+  background-color: #fff;
+  padding: 10px;
+}
+#selectedMaterialPreview {
   display: flex;
   align-items: center;
+  justify-content: center;  /* ✅ 가운데 정렬 유지 */
+  gap: 20px;
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fefefe;
+  min-height: 240px;
+  width: auto;
+max-width: 300px;
+}
+#selectedMaterialPreview img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+#selectedMaterialPreview strong {
+  font-size: 20px;
+}
+.material-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.price-edit-box {
+  display: none;
   justify-content: center;
+  align-items: center;
+  gap: 4px;
 }
 
-#prevBtn {
-  left: 10px;
-}
-
-#nextBtn {
-  right: 10px;
-}
-.best-badge {
+/* ✅ BEST 라벨 스타일 */
+.best-label {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  background: orange;
-  color: white;
-  font-size: 11px;
+  top: 6px;
+  left: 6px;
+  background-color: gold;
+  color: white; /* ✅ 글자 색상 흰색 */
+  font-size: 12px;
+  font-weight: bold;
   padding: 2px 6px;
   border-radius: 4px;
-  font-weight: bold;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  z-index: 2;
 }
 
-.basic-badge {
+/* ✅ 기본형 라벨 */
+.basic-label {
   position: absolute;
-  top: 8px;
-  left: 56px; /* BEST 배지 오른쪽 */
-  background: #3ca7ff; /* 차분한 파란색 */
+  top: 6px;
+  left: 60px;
+  background-color: #007bff;
   color: white;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: bold;
   padding: 2px 6px;
   border-radius: 4px;
-  font-weight: bold;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  z-index: 2;
 }
   </style>
 </head>
 <body>
-  <div style="display: flex; gap: 20px; padding: 20px;">
-    <div class="category">
-      <h3>자재 카테고리</h3>
-      <button onclick="toggleAdmin()">🔧 관리자 모드</button>
-      <hr />
-      <div class="main-category">장 · 거울</div>
-      <ul class="sub-category">
-        <li onclick="selectCategory('상 · 하단장')">상 · 하단장</li>
-        <li onclick="selectCategory('욕실장')">욕실장</li>
-        <li onclick="selectCategory('슬라이드장')">슬라이드장</li>
-        <li onclick="selectCategory('플랩장')">플랩장</li>
-        <li onclick="selectCategory('거울')">거울</li>
-        <li onclick="selectCategory('하부장')">하부장</li>
-      </ul>
+  <div class="container">
+    <!-- 좌측 -->
+    <div class="panel left">
+  <h3>자재 카테고리</h3>
+  <button class="admin-button" onclick="promptPassword()">🔧 관리자 모드</button>
 
-      <div class="main-category">도기</div>
-      <ul class="sub-category">
-        <li onclick="selectCategory('세면기')">세면기</li>
-        <li onclick="selectCategory('양변기(원피스)')">양변기(원피스)</li>
-        <li onclick="selectCategory('양변기(투피스)')">양변기(투피스)</li>
-        <li onclick="selectCategory('탑볼')">탑볼</li>
-      </ul>
+  <div class="category-group">
+    <div class="category-title">상부장</div>
+    <div class="category-item" onclick="selectCategory('상부장', 'LPM')">LPM</div>
+    <div class="category-item" onclick="selectCategory('상부장', 'PET')">PET</div>
+  </div>
 
-      <div class="main-category">수전</div>
-      <ul class="sub-category">
-        <li onclick="selectCategory('세면수전')">세면수전</li>
-        <li onclick="selectCategory('샤워기')">샤워기</li>
-        <li onclick="selectCategory('해바라기')">해바라기</li>
-        <li onclick="selectCategory('탑볼수전')">탑볼수전</li>
-      </ul>
+  <div class="category-group">
+    <div class="category-title">하부장</div>
+    <div class="category-item" onclick="selectCategory('하부장', 'LPM')">LPM</div>
+    <div class="category-item" onclick="selectCategory('하부장', 'PET')">PET</div>
+  </div>
 
-      <div class="main-category">악세사리</div>
-<ul class="sub-category">
-  <li onclick="selectCategory('수건걸이')">수건걸이</li>
-  <li onclick="selectCategory('슬라이드바')">슬라이드바</li>
-  <li onclick="selectCategory('휴지걸이')">휴지걸이</li>
-  <li onclick="selectCategory('코너선반')">코너선반</li>
-  <li onclick="selectCategory('대리석')">대리석</li>
-  <li onclick="selectCategory('스프레이건')">스프레이건</li>
-</ul>
+  <div class="category-group">
+    <div class="category-title">기타</div>
+    <div class="category-item" onclick="selectCategory('기타', '키큰장')">키큰장</div>
+    <div class="category-item" onclick="selectCategory('기타', '냉장고장')">냉장고장</div>
+  </div>
 
-<div class="main-category">기타</div>
-<ul class="sub-category">
-  <li onclick="selectCategory('타일')">타일</li>
-  <li onclick="selectCategory('욕조')">욕조</li>
-  <li onclick="selectCategory('파티션')">파티션</li>
-  <li onclick="selectCategory('천장')">천장</li>
-</ul>
+  <div class="category-group">
+    <div class="category-title">인조대리석 상판</div>
+    <div class="category-item" onclick="selectCategory('인조대리석상판', 'LX하이막스')">LX하이막스</div>
+    <div class="category-item" onclick="selectCategory('인조대리석상판', '오로라')">오로라</div>
+    <div class="category-item" onclick="selectCategory('인조대리석상판', '칸스톤')">칸스톤</div>
+  </div>
 
-<hr style="margin: 10px 0;" />
+  <!-- ✅ 구분선 -->
+  <hr style="margin: 16px 0; border: none; border-top: 1px solid #aaa;" />
 
-<ul class="sub-category">
-  <li onclick="selectCategory('시공비')">시공비</li>
-  <li onclick="selectCategory('별도 시공비')">별도 시공비</li>
-</ul>
-
-<hr style="margin: 10px 0;" />
-
-<ul class="sub-category">
-  <li onclick="selectCategory('세트')">세트</li>
-</ul>
-    </div>
-
-    <div class="items">
-      <h3>자재 목록</h3>
-      <div class="sort-box">
-        정렬:
-        <select onchange="sortMaterials(this.value)">
-          <option value="">기본순</option>
-          <option value="name">이름순</option>
-          <option value="price">가격순</option>
-        </select>
-      </div>
-      <div id="addAllSetButton" style="display:none; text-align:right; margin-bottom:10px;">
-        <button onclick="addAllFromSet()">모두 추가</button>
-      </div>
-      <div id="items"></div>
-    </div>
-
-    <div class="estimate">
-      <h3>견적서</h3>
-      <ul id="selectedItems"></ul>
-      <p><strong>총액: </strong><span id="totalPrice">0</span>원</p>
-      <button onclick="summarizeEstimate()">정리</button>
-      <textarea id="summaryText" style="width:100%; height:100px; margin-top:10px;"></textarea>
-    </div>
-  </div> <!-- end of flex layout -->
-
-  <div id="imageModal" onclick="closeModal(event)">
-<div id="imageWrapper" style="position: relative; display: inline-block;">
-  <img id="modalImage" src="" />
+  <!-- ✅ 추가 카테고리 -->
+  <div class="category-group">
+    <div class="category-item" onclick="selectCategory('기타', '600후드')">600후드</div>
+    <div class="category-item" onclick="selectCategory('기타', '900후드')">900후드</div>
+    <div class="category-item" onclick="selectCategory('기타', '싱크볼')">싱크볼</div>
+    <div class="category-item" onclick="selectCategory('기타', '싱크수전')">싱크수전</div>
+    <div class="category-item" onclick="selectCategory('기타', '통후드')">통후드</div>
+  <div class="category-item" onclick="selectCategory('기타', '쿡탑')">쿡탑</div>
+  <div class="category-item" onclick="selectCategory('기타', '콘센트')">콘센트</div>
 </div>
-<!-- 화살표는 모달 밖에서 고정 위치로 -->
-<button id="prevBtn">←</button>
-<button id="nextBtn">→</button>
+</div>
+
+    <!-- 중앙 + 우측 -->
+    <div class="flex-row" style="width: 100%;">
+      <!-- 상부장 자재 목록 패널 -->
+      <div class="panel" style="flex: 0 0 32%;" data-panel="upper">
+  <h3>자재 목록 (상부장)</h3>
+  <div id="upperForm">
+    <div class="section" id="upperFormSection">
+      <div>
+        <h4 id="upperShapeTitle">형태 선택 (상부장)</h4>
+        <div class="radio-group" id="upperShapeOptions">
+          <label><input type="radio" name="upperShape" value="1" onclick="updateSizeInputs('upper', 1)"> 一자형</label>
+          <label><input type="radio" name="upperShape" value="2" onclick="updateSizeInputs('upper', 2)"> ㄱ자형</label>
+          <label><input type="radio" name="upperShape" value="3" onclick="updateSizeInputs('upper', 3)"> ㄷ자형</label>
+        </div>
+      </div>
+
+      <div class="section" id="upperSizeSection">
+  <h4>사이즈 입력</h4>
+  <div style="display: flex; align-items: center; gap: 10px;">
+  <div class="size-inputs" id="upperSizeInputs"></div>
+  <button onclick="addUpperSizeOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+
+<hr style="margin: 12px 0; border: none; border-top: 1px solid #ccc;" />
+
+<div class="unit-price-group" style="display: none;">
+    <input type="number" id="upperUnitPriceInput" placeholder="단가 (원)" />
+    <button id="upperSaveUnitBtn" onclick="saveUnitPrice('upper')">💾 저장</button>
+  </div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+  <div style="display: flex; gap: 10px;">
+    <label>600측판:</label>
+    <input type="number" id="upperSide600Input" placeholder="개수" style="width: 80px;" />
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <label>비규격 측판:</label>
+    <input type="number" id="upperSideCustomInput" placeholder="개수" style="width: 80px;" />
+  <button onclick="addUpperSideCustomOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+</div>
+
+<!-- ✅ 구분선과 라벨은 바깥으로 빼기 -->
+<hr style="margin: 16px 0; border: none; border-top: 1px solid #ccc;" />
+
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+  <span style="font-size: 15px; font-weight: normal;">상부장 간접조명</span>
+  <input type="checkbox" id="upperLightingCheckbox" />
+<button onclick="addUpperLightingOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+
+  <button class="add-button" onclick="addToEstimate('upper')">견적에 추가</button>
+</div>
+
+      <!-- ✅ 자재 카드 표시 영역 -->
+      <div id="upperMaterialList" class="material-grid small"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 하부장 자재 목록 패널 -->
+<div class="panel" style="flex: 0 0 32%;" data-panel="lower">
+  <h3>자재 목록 (하부장)</h3>
+  <div id="lowerForm">
+    <div class="section" id="lowerFormSection">
+      <div>
+        <h4 id="lowerShapeTitle">형태 선택 (하부장)</h4>
+        <div class="radio-group" id="lowerShapeOptions">
+  <label><input type="radio" name="lowerShape" value="1" onclick="updateSizeInputs('lower', 1)"> 一자형</label>
+  <label><input type="radio" name="lowerShape" value="2" onclick="updateSizeInputs('lower', 2)"> ㄱ자형</label>
+  <label><input type="radio" name="lowerShape" value="3" onclick="updateSizeInputs('lower', 3)"> ㄷ자형</label>
+</div>
+      </div>
+
+      <div class="section" id="lowerSizeSection">
+  <h4>사이즈 입력</h4>
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <div class="size-inputs" id="lowerSizeInputs"></div>
+    <button onclick="addLowerSizeOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+  </div>
+
+<hr style="margin: 12px 0; border: none; border-top: 1px solid #ccc;" />
+
+  <div class="unit-price-group" style="display: none;">
+    <input type="number" id="lowerUnitPriceInput" placeholder="단가 (원)" />
+    <button id="lowerSaveUnitBtn" onclick="saveUnitPrice('lower')">💾 저장</button>
+  </div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+  <div style="display: flex; gap: 10px;">
+    <label>600측판:</label>
+    <input type="number" id="lowerSide600Input" placeholder="개수" style="width: 80px;" />
+  </div>
+  <div style="display: flex; gap: 10px;">
+  <label>비규격 측판:</label>
+  <input type="number" id="lowerSideCustomInput" placeholder="개수" style="width: 80px;" />
+  <button onclick="addLowerSidePanelsOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+
+<hr style="margin: 12px 0; border: none; border-top: 1px solid #ccc;" />
+</div>
+
+        <!-- ✅ 서랍장 입력칸 추가 -->
+  <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+  <!-- ✅ 상단: 서랍장 길이 입력 -->
+  <div style="display: flex; align-items: center; gap: 10px;">
+  <label style="white-space: nowrap;">서랍장:</label>
+  <input type="number" id="drawerInput" placeholder="서랍장 길이 (mm)" style="width: 120px; padding: 8px; font-size: 16px;" />
+  <button onclick="addLowerDrawerOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+
+  <!-- ✅ 중간: 단수 선택 -->
+  <div style="display: flex; gap: 10px;">
+    <label><input type="checkbox" id="twoTier"> 2단</label>
+    <label><input type="checkbox" id="threeTier"> 3단</label>
+  </div>
+
+  <!-- ✅ 하단: 레일 선택 -->
+  <div style="display: flex; gap: 10px;">
+    <label><input type="checkbox" id="ballRail"> 볼레일</label>
+    <label><input type="checkbox" id="underRail"> 언더레일</label>
+  </div>
+
+<hr style="margin: 12px 0; border: none; border-top: 1px solid #ccc;" />
+
+<!-- ✅ 밥솥장 입력 -->
+<div style="display: flex; align-items: center; gap: 10px;">
+  <label style="white-space: nowrap;">밥솥장:</label>
+  <input type="number" id="riceBoxInput" placeholder="밥솥장 길이 (mm)" style="width: 120px; padding: 8px; font-size: 16px;" />
+  <button onclick="addLowerRiceBoxOnly()" class="add-button" style="padding: 4px 8px; font-size: 13px;">추가</button>
+</div>
+
+<!-- ✅ 밥솥장 레일 선택 -->
+  <div style="display: flex; gap: 10px; margin-top: 6px;">
+    <label><input type="checkbox" id="riceBallRail"> 볼레일</label>
+    <label><input type="checkbox" id="riceUnderRail"> 언더레일</label>
+</div>
+</div>
+
+  <button class="add-button" onclick="addToEstimate('lower')">견적에 추가</button>
+</div>
+
+      <!-- ✅ 자재 카드 표시 영역 -->
+      <div id="lowerMaterialList" class="material-grid small"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 인조대리석 상판 전용 패널 (하부장 패널 바깥에 위치해야 함) -->
+<div class="panel" style="display: none;" id="artificialTopSection">
+  <h3 id="artificialTopTitle">형태 선택 (상판)</h3>
+
+  <!-- ✅ 라디오 그룹 + 미리보기 박스 나란히 배치 -->
+  <div style="display: flex; gap: 40px; align-items: flex-start;">
+    <!-- 좌측: 라디오, 사이즈 입력, 저장/추가 버튼 -->
+    <div>
+      <div class="radio-group">
+        <label><input type="radio" name="artShape" value="1" onclick="updateSizeInputs('art', 1)"> 一자형</label>
+        <label><input type="radio" name="artShape" value="2" onclick="updateSizeInputs('art', 2)"> ㄱ자형</label>
+        <label><input type="radio" name="artShape" value="3" onclick="updateSizeInputs('art', 3)"> ㄷ자형</label>
+      </div>
+      <div class="section" id="artSizeSection">
+  <h4>사이즈 입력</h4>
+  <div class="size-inputs" id="artSizeInputs"></div>
+</div>
+      <div class="unit-price-group" style="display: none;">
+        <input type="number" id="artUnitPriceInput" placeholder="단가 (원)" />
+        <button id="artSaveUnitBtn" onclick="saveUnitPrice('art')">💾 저장</button>
+      </div>
+      <button class="add-button" onclick="addToEstimate('art')">견적에 추가</button>
+    </div>
+
+    <!-- 우측: 선택된 자재 미리보기 박스 -->
+    <div id="selectedMaterialPreview"></div>
+  </div>
+
+  <!-- 하단: 자재 카드 목록 -->
+  <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 12px;">
+    <strong>※ 자재 목록은 여기 표시됩니다.</strong>
+    <div id="artificialMaterialList" class="material-grid"></div>
+  </div>
+</div>
+
+      <!-- ✅ 우측 견적서 패널을 같은 줄에 배치 -->
+      <div class="panel right" style="flex: 0 0 300px;">
+        <h3>견적서</h3>
+        <div id="estimateList"></div>
+<div id="totalCostBox" style="margin-top: 20px; font-size: 16px; font-weight: bold; text-align: right;">
+  총액: <span id="totalCost">0</span> 원
+</div>
+<button onclick="clearEstimate()" ...
+<button onclick="clearEstimate()" style="margin-top:10px; background:#c00; color:white; padding:6px 10px; border:none; border-radius:4px; cursor:pointer;">전체 삭제</button>
+<div id="adminPanel" class="admin-panel" style="display: none;">
+  <h4>🔧 관리자 모드</h4>
+
+  <!-- ✅ 이 줄이 반드시 있어야 함 -->
+  <label>현재 카테고리: <span id="currentCategoryText">-</span></label>
+<br>
+  <label>자재 이름:</label>
+  <input type="text" id="adminName" />
+
+  <label>가격:</label>
+  <input type="number" id="adminPrice" />
+
+  <label>이미지 1:</label>
+  <input type="file" id="adminImgFile1" accept="image/*" />
+
+  <label>이미지 2:</label>
+  <input type="file" id="adminImgFile2" accept="image/*" />
+
+  <button onclick="uploadMaterial()">자재 추가하기</button>
+  <button onclick="closeAdminPanel()">관리자 모드 닫기</button>
+</div>
+      </div>
+    </div>
   </div>
 
   <script>
-  const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyTujt87IIM_QenEbo9kUyVSLiIkvoj95wSJ8lbL5XfU0wDY-6MD1p3kx7J5a1XJRga/exec";
-  let materials = {};
-  let selected = [];
-  let currentCategory = "";
-  let currentSort = "";
-  let isAdminMode = false;
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEEJ9w4pDdkjI7PpECtqu_zJxICH3OCivY7JbLwuSyRlpOyc0hgVAJqaNLaDnei1jdIQ/exec";
 
-  async function fetchMaterials() {
-    const res = await fetch(SHEETS_API_URL);
-    const data = await res.json();
-    materials = {};
-    data.forEach(item => {
-      if (!materials[item.category]) materials[item.category] = [];
-materials[item.category].push({
-  name: item.name,
-  price: parseInt(item.price),
-  img1: item.img1 || item.img,
-  img2: item.img2 || item.img,
- isBest: item.isBest?.toString().toUpperCase() === "TRUE",
-  isBasic: item.isBasic?.toString().toUpperCase() === "TRUE"
-});
+let isAdmin = false;
+let selectedMaterialName = "";
+let upperCategory = "";
+let lowerCategory = "";
+
+// ✅ 측판 단가 고정 테이블
+const sidePanelPrices = {
+  "상부장-LPM":   { "600": 30000, "비규격": 100000 },
+  "상부장-PET":   { "600": 40000, "비규격": 120000 },
+  "하부장-LPM":   { "600": 40000, "비규격": 100000 },
+  "하부장-PET":   { "600": 50000, "비규격": 120000 }
+};
+
+let currentMainCategory = "";
+let currentSubCategory = "";
+let currentCategory = "";
+let unitPrices = {};
+let allMaterials = [];
+
+window.onload = function () {
+  fetch(SCRIPT_URL + "?view=materials")
+    .then(res => res.json())
+    .then(materials => {
+      allMaterials = materials;
+      return fetch(SCRIPT_URL);
+    })
+    .then(res => res.json())
+    .then(data => {
+      unitPrices = data;
     });
-    if (currentCategory) showItems(currentCategory);
-  }
 
-  function selectCategory(category) {
-    currentCategory = category;
-    document.getElementById('currentCategoryText').innerText = category;
-    document.getElementById('addAllSetButton').style.display = (category === '세트') ? 'block' : 'none';
-    showItems(category);
-  }
-
-  function showItems(category) {
-    const container = document.getElementById('items');
-    container.innerHTML = '';
-    let items = materials[category] ? [...materials[category]] : [];
-
-    if (currentSort === 'name') {
-      items.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-    } else if (currentSort === 'price') {
-      items.sort((a, b) => a.price - b.price);
-    }
-items.sort((a, b) => {
-    if (a.isBest && !b.isBest) return -1;
-    if (!a.isBest && b.isBest) return 1;
-    return 0;
+  // ✅ 2단 / 3단 중 하나만 선택
+  document.getElementById("twoTier").addEventListener("change", function () {
+    if (this.checked) document.getElementById("threeTier").checked = false;
+  });
+  document.getElementById("threeTier").addEventListener("change", function () {
+    if (this.checked) document.getElementById("twoTier").checked = false;
   });
 
-    items.forEach((item, i) => {
-      const div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML = `
-  ${item.isBest ? `<div class="best-badge">BEST</div>` : ""}
-${item.isBasic ? `<div class="basic-badge">기본형</div>` : ""}
-  <img src="${item.img1}" onclick="openModal('${item.img1}', '${item.img2}')">
-  <div class="name">${item.name}</div>
-  <div class="price">
-    <span id="item-price-${i}">${item.price.toLocaleString()}원</span>
-    ${isAdminMode ? `<button onclick="editItemPrice(${i})">✎</button>` : ""}
+  // ✅ 볼레일 / 언더레일 중 하나만 선택
+  document.getElementById("ballRail").addEventListener("change", function () {
+    if (this.checked) document.getElementById("underRail").checked = false;
+  });
+  document.getElementById("underRail").addEventListener("change", function () {
+    if (this.checked) document.getElementById("ballRail").checked = false;
+  });
+
+ // ✅ 추가: 밥솥장용 볼/언더레일
+  document.getElementById("riceBallRail").addEventListener("change", function () {
+    if (this.checked) document.getElementById("riceUnderRail").checked = false;
+  });
+  document.getElementById("riceUnderRail").addEventListener("change", function () {
+    if (this.checked) document.getElementById("riceBallRail").checked = false;
+  });
+
+  document.getElementById("imageModal").addEventListener("click", function () {
+    this.style.display = "none";
+  });
+};
+
+    function promptPassword() {
+  const input = prompt("관리자 비밀번호를 입력하세요:");
+  if (input === "1760") {
+    document.getElementById("adminPanel").style.display = "block";
+    isAdmin = true;
+
+    document.querySelectorAll(".unit-price-group").forEach(el => {
+      el.style.display = "block";
+    });
+
+    document.getElementById("currentCategoryText").textContent = currentSubCategory || "-";
+
+    if (currentMainCategory === "인조대리석상판") {
+      loadArtificialMaterials();  // ✅ 관리자 모드 켜졌을 때 목록 다시 그리기
+    }
+  } else if (input !== null) {
+    alert("비밀번호가 틀렸습니다.");
+  }
+}
+
+    function closeAdminPanel() {
+  document.getElementById("adminPanel").style.display = "none";
+  isAdmin = false;
+  document.querySelectorAll(".unit-price-group").forEach(el => {
+    el.style.display = "none";
+  });
+
+  if (currentMainCategory === "인조대리석상판") {
+    loadArtificialMaterials();  // ✅ 관리자모드 꺼질 때 새로고침
+  }
+}
+
+    function selectCategory(main, sub) {
+selectedMaterialName = ""; // ✅ 자재명 초기화
+  const fullCategory = `${main}-${sub}`;
+  currentMainCategory = main;
+  currentSubCategory = sub;
+  currentCategory = fullCategory;
+
+ if (main === "상부장") {
+  upperCategory = fullCategory;
+
+  // ✅ 냉장고장 패널 숨기기 추가
+  const fridgePanel = document.getElementById("customFridgePanel");
+  if (fridgePanel) fridgePanel.style.display = "none";
+
+  // ✅ 키큰장 패널 숨기기
+  const keyPanel = document.getElementById("customKeyPanel");
+  if (keyPanel) keyPanel.style.display = "none";
+
+  // ✅ 후드/수전 독립 패널 숨기기
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("customEtcPanel")) {
+      panel.style.display = "none";
+    }
+  });
+
+  // ✅ 상부장 패널 보이기
+  document.querySelector('[data-panel="upper"]').style.display = "block";
+  document.getElementById("upperFormSection").style.display = "block";
+
+  // ✅ 인조대리석 패널 숨기기
+  document.getElementById("artificialTopSection").style.display = "none";
+  document.getElementById("artificialTopSection").classList.remove("full-width");
+
+  document.getElementById("upperShapeTitle").textContent = `형태 선택 (${sub}) - 미선택`;
+
+  if (isAdmin) {
+    document.getElementById("upperUnitPriceInput").value = unitPrices[upperCategory] || "";
+  }
+
+  // ✅ 자재 불러오기
+  loadPanelMaterials("upper", fullCategory);
+}
+
+else if (main === "하부장") {
+  lowerCategory = fullCategory;
+
+  const fridgePanel = document.getElementById("customFridgePanel");
+  if (fridgePanel) fridgePanel.style.display = "none";
+
+  const keyPanel = document.getElementById("customKeyPanel");
+  if (keyPanel) keyPanel.style.display = "none";
+
+  // ✅ 후드/수전 패널도 숨김
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("customEtcPanel")) {
+      panel.style.display = "none";
+    }
+  });
+
+  document.querySelector('[data-panel="lower"]').style.display = "block";
+  document.getElementById("lowerFormSection").style.display = "block";
+
+  document.getElementById("artificialTopSection").style.display = "none";
+  document.getElementById("artificialTopSection").classList.remove("full-width");
+
+  document.getElementById("lowerShapeTitle").textContent = `형태 선택 (${sub}) - 미선택`;
+
+  if (isAdmin) {
+    document.getElementById("lowerUnitPriceInput").value = unitPrices[lowerCategory] || "";
+  }
+
+  // ✅ 자재 불러오기
+  loadPanelMaterials("lower", fullCategory);
+}
+
+else if (main === "인조대리석상판") {
+  // ✅ 키큰장 패널 숨기기
+  const keyPanel = document.getElementById("customKeyPanel");
+  if (keyPanel) keyPanel.style.display = "none";
+
+  // ✅ 냉장고장 패널 숨기기
+  const fridgePanel = document.getElementById("customFridgePanel");
+  if (fridgePanel) fridgePanel.style.display = "none";
+
+  // ✅ 후드/수전 패널 숨기기
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("customEtcPanel")) {
+      panel.style.display = "none";
+    }
+  });
+
+  // ✅ 상부/하부 패널 숨기기
+  document.getElementById("upperFormSection").style.display = "none";
+  document.getElementById("lowerFormSection").style.display = "none";
+  document.querySelector('[data-panel="upper"]').style.display = "none";
+  document.querySelector('[data-panel="lower"]').style.display = "none";
+
+  // ✅ 인조대리석 패널 보이기
+  document.getElementById("artificialTopSection").style.display = "flex";
+  document.getElementById("artificialTopSection").classList.add("full-width");
+  document.getElementById("artificialTopTitle").textContent = `형태 선택 (${sub})`;
+
+  // ✅ 미리보기 및 단가 초기화
+  document.getElementById("selectedMaterialPreview").innerHTML = "";
+  document.getElementById("artUnitPriceInput").value = "";
+
+  // ✅ 자재 목록 불러오기
+  loadArtificialMaterials();
+
+  if (isAdmin) {
+    document.getElementById("currentCategoryText").textContent = currentSubCategory || "-";
+  }
+
+} else if (main === "기타" && sub === "키큰장") {
+  // ✅ 인조대리석 패널도 숨김 (이게 빠져 있었음)
+  document.getElementById("artificialTopSection").style.display = "none";
+  document.getElementById("artificialTopSection").classList.remove("full-width");
+
+  // ✅ 모든 기존 패널 숨기기
+  document.querySelector('[data-panel="upper"]').style.display = "none";
+  document.querySelector('[data-panel="lower"]').style.display = "none";
+  document.getElementById("upperFormSection").style.display = "none";
+  document.getElementById("lowerFormSection").style.display = "none";
+
+  // ✅ 기타 패널 숨김
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("custom") && panel.id !== "customKeyPanel") {
+      panel.style.display = "none";
+    }
+  });
+
+  const flexRow = document.querySelector(".flex-row");
+  let custom = document.getElementById("customKeyPanel");
+
+  if (!custom) {
+    const newPanel = document.createElement("div");
+    newPanel.className = "panel";
+    newPanel.id = "customKeyPanel";
+    newPanel.style.flex = "0 0 32%";
+
+    newPanel.innerHTML = `
+  <h3>키큰장</h3>
+  <div class="size-inputs" style="flex-direction: column; align-items: flex-start;">
+    <label style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">길이 입력</label>
+    <input type="number" placeholder="길이 (mm)" id="keyTallLength" />
   </div>
-  <div class="control">
-    <input type="number" min="1" value="1" id="qty-${item.name}">
-    <button onclick="addToEstimate('${category}', '${item.name}')">추가</button>
+
+  <hr style="margin: 16px 0; border: none; border-top: 1px solid #ccc;" />
+
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+    <label style="font-size: 15px;">측판:</label>
+    <input type="number" id="keyTallSideCount" placeholder="개수" style="width: 80px; padding: 6px;" />
   </div>
-${isAdminMode ? `
-  ${item.isBest
-    ? `<button class="best-btn" onclick="unmarkAsBest('${category}', '${item.name}')">BEST 삭제</button>`
-    : `<button class="best-btn" onclick="markAsBest('${category}', '${item.name}')">BEST 추가</button>`}
-  ${item.isBasic
-    ? `<button class="best-btn" onclick="unmarkAsBasic('${category}', '${item.name}')">기본형 삭제</button>`
-    : `<button class="best-btn" onclick="markAsBasic('${category}', '${item.name}')">기본형 추가</button>`}
-` : ""}
+
+  <button class="add-button" onclick="addKeyTallToEstimate()">견적에 추가</button>
 `;
-      container.appendChild(div);
-    });
+    flexRow.insertBefore(newPanel, document.querySelector(".panel.right"));
+  } else {
+    custom.style.display = "block";
   }
 
-  function sortMaterials(type) {
-    currentSort = type;
-    if (currentCategory) showItems(currentCategory);
-  }
-
-  function addToEstimate(category, name) {
-    const item = materials[category].find(i => i.name === name);
-    const qtyInput = document.getElementById(`qty-${item.name}`);
-    const qty = parseInt(qtyInput.value);
-
-    if (isNaN(qty) || qty <= 0) {
-      alert("수량을 입력하세요");
-      return;
+  // 나머지 키큰장 외의 패널 숨김 (혹시 다른 기타 패널이 생길 경우 대비)
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("custom") && panel.id !== "customKeyPanel") {
+      panel.style.display = "none";
     }
-
-    const existing = selected.find(i => i.name === item.name);
-    if (existing) {
-      existing.quantity += qty;
-    } else {
-      selected.push({ ...item, quantity: qty, category });
-    }
-
-    renderEstimate();
-  }
-
-  function addAllFromSet() {
-    const items = materials[currentCategory] || [];
-    items.forEach(item => {
-      selected.push({ ...item, quantity: 1, category: currentCategory });
-    });
-    renderEstimate();
-  }
-
-  function renderEstimate() {
-    const list = document.getElementById('selectedItems');
-    list.innerHTML = '';
-    selected.forEach((item, i) => {
-      const nameOnly = item.name.split("(")[0];
-      const code = item.name.match(/\((.*?)\)/)?.[1] || '';
-      list.innerHTML += `
-        <li class="estimate-item">
-          <img src="${item.img1}" onclick="openModal('${item.img1}', '${item.img2}')">
-          <div class="info-line">
-            <div>${nameOnly}</div>
-            <div>${code} x ${item.quantity}</div>
-          </div>
-          <div class="price-delete">
-            <span>${(item.price * item.quantity).toLocaleString()}원</span>
-            <button class="delete-btn" onclick="removeItem(${i})">✕</button>
-          </div>
-        </li>
-      `;
-    });
-    updateTotal();
-  }
-
-  function updateTotal() {
-    const total = selected.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    document.getElementById('totalPrice').textContent = total.toLocaleString();
-  }
-
-  function summarizeEstimate() {
-  const countMap = {};
-  selected.forEach(item => {
-    if (item.category === "시공비") return; // 시공비는 정리에서 제외
-    if (!countMap[item.name]) countMap[item.name] = 0;
-    countMap[item.name] += item.quantity;
   });
-    const summaryParts = Object.entries(countMap).map(([name, qty]) =>
-      qty > 1 ? `${name} ${qty}EA` : name
-    );
-    summaryParts.push("다운라이트 2EA");
-    document.getElementById("summaryText").value = summaryParts.join(", ");
+}
+
+// ✅ 이 아래에 정확하게 냉장고장 처리 추가
+else if (main === "기타" && sub === "냉장고장") {
+  document.getElementById("artificialTopSection").style.display = "none";
+  document.getElementById("artificialTopSection").classList.remove("full-width");
+  document.querySelector('[data-panel="upper"]').style.display = "none";
+  document.querySelector('[data-panel="lower"]').style.display = "none";
+  document.getElementById("upperFormSection").style.display = "none";
+  document.getElementById("lowerFormSection").style.display = "none";
+
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("custom") && panel.id !== "customFridgePanel") {
+      panel.style.display = "none";
+    }
+  });
+
+  const flexRow = document.querySelector(".flex-row");
+  let fridgePanel = document.getElementById("customFridgePanel");
+
+  if (!fridgePanel) {
+    const newPanel = document.createElement("div");
+    newPanel.className = "panel";
+    newPanel.id = "customFridgePanel";
+    newPanel.style.flex = "0 0 32%";
+    newPanel.innerHTML = `
+  <h3>냉장고장</h3>
+  <div class="size-inputs" style="flex-direction: column; align-items: flex-start;">
+    <label style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">길이 입력</label>
+    <input type="number" placeholder="길이 (mm)" id="fridgeLength" />
+
+    <label style="margin-top: 12px; font-size: 16px; font-weight: bold;">개수 입력</label>
+    <input type="number" placeholder="개수" id="fridgeCount" />
+
+    <label style="margin-top: 12px; font-size: 16px; font-weight: bold;">측판 개수</label>
+    <input type="number" placeholder="측판 개수" id="fridgeSideCount" />
+  </div>
+
+  <button class="add-button" onclick="addFridgeToEstimate()" style="margin-top: 16px;">견적에 추가</button>
+`;
+    flexRow.insertBefore(newPanel, document.querySelector(".panel.right"));
+  } else {
+    fridgePanel.style.display = "block";
+  }
+}
+
+// ✅ 여기에 600후드/900후드/싱크볼/싱크수전 처리 추가
+else if (["600후드", "900후드", "싱크볼", "싱크수전", "통후드", "쿡탑", "콘센트"].includes(sub)) {
+  // 기존 패널 숨기기
+  document.getElementById("artificialTopSection").style.display = "none";
+  document.getElementById("artificialTopSection").classList.remove("full-width");
+  document.querySelector('[data-panel="upper"]').style.display = "none";
+  document.querySelector('[data-panel="lower"]').style.display = "none";
+  document.getElementById("upperFormSection").style.display = "none";
+  document.getElementById("lowerFormSection").style.display = "none";
+
+  // 다른 custom 패널 숨기기
+document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+  if (panel.id.startsWith("customEtcPanel") && panel.id !== `customEtcPanel-${sub}`) {
+    panel.style.display = "none";
+  }
+});
+
+  const flexRow = document.querySelector(".flex-row");
+  let etcPanel = document.getElementById(`customEtcPanel-${sub}`);
+
+  if (!etcPanel) {
+  const newPanel = document.createElement("div");
+  newPanel.className = "panel";
+  newPanel.id = `customEtcPanel-${sub}`;
+  newPanel.style.flex = "1"; // ✅ 여기가 핵심
+  newPanel.innerHTML = `
+    <h3>자재 목록 (${sub})</h3>
+    <div id="etcMaterialList-${sub}" class="material-grid"></div>
+  `;
+  flexRow.insertBefore(newPanel, document.querySelector(".panel.right"));
+} else {
+  etcPanel.innerHTML = `
+    <h3>자재 목록 (${sub})</h3>
+    <div id="etcMaterialList-${sub}" class="material-grid"></div>
+  `;
+  etcPanel.style.display = "block";
+  etcPanel.style.flex = "1"; // ✅ 재사용 시도 반영
+}
+// ✅ 이 아래에 자재 목록 불러오기 함수 호출 추가!
+  loadEtcMaterials(fullCategory, `etcMaterialList-${sub}`);
+}
+if (isAdmin) {
+  document.getElementById("currentCategoryText").textContent = currentSubCategory || "-";
+}
+}
+
+    function updateSizeInputs(part, count) {
+  // 기존 사이즈 입력 섹션 모두 숨김
+  document.getElementById(part + "SizeSection").style.display = "none";
+
+  // 새로 선택한 사이즈 입력 섹션 표시
+  const container = document.getElementById(part + "SizeInputs");
+  container.innerHTML = "";
+
+  for (let i = 1; i <= count; i++) {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.placeholder = `길이 ${i} (mm)`;
+    container.appendChild(input);
   }
 
-  function removeItem(index) {
-    selected.splice(index, 1);
-    renderEstimate();
+  // 해당 섹션 보이게 설정
+  document.getElementById(part + "SizeSection").style.display = "block";
+}
+
+    function saveUnitPrice(part) {
+  let category = "";
+if (part === "upper") category = upperCategory;
+else if (part === "lower") category = lowerCategory;
+else if (part === "art") category = currentCategory;
+  const input = document.getElementById(part + "UnitPriceInput");
+  const unitPrice = parseFloat(input.value);
+
+  if (!category || isNaN(unitPrice)) {
+    alert("카테고리를 선택하고 단가를 입력하세요.");
+    return;
   }
 
-  function toggleAdmin() {
-    const pw = prompt("관리자 비밀번호를 입력하세요:");
-    if (pw === "1760") {
-      isAdminMode = true;
-      document.getElementById('adminPanel').style.display = 'block';
-      if (currentCategory) showItems(currentCategory);
-    } else {
-      alert("비밀번호가 틀렸습니다.");
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "unitPrice",
+      category,
+      price: unitPrice
+    })
+  })
+  .then(res => res.text())
+  .then(() => {
+    alert("단가 저장 완료");
+    unitPrices[category] = unitPrice;
+  });
+}
+
+    function addToEstimate(part) {
+  let category = "";
+  if (part === "upper") category = upperCategory;
+  else if (part === "lower") category = lowerCategory;
+  else if (part === "art") category = currentCategory;
+
+  const inputs = document.querySelectorAll(`#${part}SizeInputs input`);
+  let totalLengthMM = 0;
+
+  const selectedShape = document.querySelector(`input[name="${part}Shape"]:checked`);
+  const shapeLabel = selectedShape 
+    ? selectedShape.parentElement.textContent.trim() 
+    : "";
+
+  inputs.forEach(input => {
+    const val = parseFloat(input.value);
+    if (!isNaN(val)) totalLengthMM += val;
+  });
+
+  const totalLengthM = totalLengthMM / 1000;
+
+  let unitPrice = parseFloat(document.getElementById(part + "UnitPriceInput").value);
+  if (isNaN(unitPrice) || unitPrice === 0) {
+    unitPrice = unitPrices[category] || 0;
+  }
+
+  const totalCost = Math.round(totalLengthM * unitPrice);
+  let text = `${shapeLabel} ${category} / 총길이 ${totalLengthMM}mm = <strong>${totalCost.toLocaleString()}원</strong>`;
+
+// ✅ 인조대리석에는 측판 없음 → upper/lower일 때만 처리
+if (part === "upper" || part === "lower") {
+  const side600Qty = parseFloat(document.getElementById(part + "Side600Input").value);
+  const sideCustomQty = parseFloat(document.getElementById(part + "SideCustomInput").value);
+  const baseCat = (part === "upper") ? upperCategory : lowerCategory;
+
+  if (!isNaN(side600Qty) && side600Qty > 0) {
+    const unit = sidePanelPrices[baseCat]?.["600"] || 0;
+    const cost = unit * side600Qty;
+    text += `<br>600측판 ${side600Qty}개 = <strong>${cost.toLocaleString()}원</strong>`;
+  }
+
+  if (!isNaN(sideCustomQty) && sideCustomQty > 0) {
+    const unit = sidePanelPrices[baseCat]?.["비규격"] || 0;
+    const cost = unit * sideCustomQty;
+    text += `<br>비규격측판 ${sideCustomQty}개 = <strong>${cost.toLocaleString()}원</strong>`;
+  }
+}
+
+  // ✅ 하부장 서랍장/밥솥장 추가
+  if (part === "lower") {
+    const drawerVal = parseFloat(document.getElementById("drawerInput").value);
+    if (!isNaN(drawerVal) && drawerVal > 0) {
+      const drawerM = drawerVal / 1000;
+      let drawerCost = Math.round(drawerM * 150000 * 1.3);
+
+      const isBall = document.getElementById("ballRail").checked;
+      const isUnder = document.getElementById("underRail").checked;
+      const isTwoTier = document.getElementById("twoTier").checked;
+      const isThreeTier = document.getElementById("threeTier").checked;
+
+      if (isUnder) {
+        if (isTwoTier) drawerCost += 40000;
+        if (isThreeTier) drawerCost += 60000;
+      }
+
+      let railText = "";
+      if (isTwoTier) railText += " (2단)";
+      if (isThreeTier) railText += " (3단)";
+      if (isBall) railText += " (볼레일)";
+      if (isUnder) railText += " (언더레일)";
+
+      text += `<br>서랍장 ${drawerVal}mm${railText} = <strong>${drawerCost.toLocaleString()}원</strong>`;
+    }
+
+    const riceVal = parseFloat(document.getElementById("riceBoxInput").value);
+    if (!isNaN(riceVal) && riceVal > 0) {
+      const riceM = riceVal / 1000;
+      let riceCost = Math.round(riceM * 150000 * 1.5);
+
+      const isRiceUnder = document.getElementById("riceUnderRail").checked;
+      if (isRiceUnder) riceCost += 20000;
+
+      let riceRailText = "";
+      if (document.getElementById("riceBallRail").checked) riceRailText = " (볼레일)";
+      if (isRiceUnder) riceRailText = " (언더레일)";
+
+      text += `<br>하부장 밥솥장 ${riceVal}mm${riceRailText} = <strong>${riceCost.toLocaleString()}원</strong>`;
     }
   }
 
-  function closeAdmin() {
-    isAdminMode = false;
-    document.getElementById('adminPanel').style.display = 'none';
-    if (currentCategory) showItems(currentCategory);
+  if (part === "upper") {
+    const lightingChecked = document.getElementById("upperLightingCheckbox").checked;
+    if (lightingChecked) {
+      text += `<br>상부장 간접조명 = <strong>150,000원</strong>`;
+    }
   }
 
-  function editItemPrice(index) {
-    const span = document.getElementById(`item-price-${index}`);
-    const item = materials[currentCategory][index];
-    span.innerHTML = `
-      <input type="number" id="new-price-${index}" value="${item.price}" style="width:70px">
-      <button onclick="saveItemPrice(${index})">저장</button>
-    `;
+  const list = document.getElementById("estimateList");
+  const item = document.createElement("div");
+  const lines = text.split('<br>');
+  item.innerHTML = lines.map(line => `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${line}</span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()"
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>
+  `).join('');
+  list.appendChild(item);
+
+  updateTotalCost(); // ✅ 총액 갱신
+
+  // ✅ 입력값 초기화 추가
+  if (part === "upper") {
+    document.querySelectorAll("#upperSizeInputs input").forEach(input => input.value = "");
+    document.getElementById("upperSide600Input").value = "";
+    document.getElementById("upperSideCustomInput").value = "";
+    document.getElementById("upperLightingCheckbox").checked = false;
+  } else if (part === "lower") {
+    document.querySelectorAll("#lowerSizeInputs input").forEach(input => input.value = "");
+    document.getElementById("lowerSide600Input").value = "";
+    document.getElementById("lowerSideCustomInput").value = "";
+    document.getElementById("drawerInput").value = "";
+    document.getElementById("riceBoxInput").value = "";
+    ["twoTier", "threeTier", "ballRail", "underRail", "riceBallRail", "riceUnderRail"].forEach(id => {
+      document.getElementById(id).checked = false;
+    });
+  } else if (part === "art") {
+    document.querySelectorAll("#artSizeInputs input").forEach(input => input.value = "");
+    document.getElementById("artUnitPriceInput").value = "";
+    document.getElementById("selectedMaterialPreview").innerHTML = "";
   }
 
-function editItemPrice(index) {
-  const span = document.getElementById(`item-price-${index}`);
-  const name = span.closest('.item').querySelector('.name').textContent;
-  span.innerHTML = `
-    <input type="number" id="new-price-${index}" value="" style="width:70px">
-    <button onclick="saveItemPrice('${name}', ${index})">저장</button>
+  // ✅ 자재명 표시 업데이트
+  if (part === "upper") {
+    document.getElementById("upperShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${selectedMaterialName}`;
+  } else if (part === "lower") {
+    document.getElementById("lowerShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${selectedMaterialName}`;
+  } else if (part === "art") {
+    document.getElementById("artificialShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${selectedMaterialName}`;
+  }
+}
+
+function addKeyTallToEstimate() {
+  const length = parseFloat(document.getElementById("keyTallLength").value);
+  const sideCount = parseFloat(document.getElementById("keyTallSideCount").value);
+
+  if (isNaN(length) || length <= 0) {
+    alert("길이를 올바르게 입력하세요.");
+    return;
+  }
+
+  const unit = 300;
+  const unitPrice = 125000;
+  const sideUnitPrice = 80000;
+
+  const roundedLength = Math.ceil(length / unit) * unit;
+  const unitCount = roundedLength / unit;
+  const mainCost = unitCount * unitPrice;
+
+  const sideCost = (!isNaN(sideCount) && sideCount > 0) ? sideCount * sideUnitPrice : 0;
+  const totalCost = mainCost + sideCost;
+
+  const list = document.getElementById("estimateList");
+  const item = document.createElement("div");
+ item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>키큰장 ${length}mm = <strong>${totalCost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()"
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+  list.appendChild(item);
+  updateTotalCost(); // ✅ 총액 갱신
+}
+
+function clearEstimate() {
+  document.getElementById("estimateList").innerHTML = "";
+  updateTotalCost(); // ✅ 총액 초기화
+}
+function loadArtificialMaterials() {
+  const filtered = allMaterials.filter(item => item.category === currentCategory);
+  // ✅ BEST 먼저 오도록 정렬
+  filtered.sort((a, b) => {
+    const aBest = a.best === "Y" || a.best === true;
+    const bBest = b.best === "Y" || b.best === true;
+    return (bBest ? 1 : 0) - (aBest ? 1 : 0);
+  });
+
+  const container = document.getElementById("artificialMaterialList");
+  container.innerHTML = "";
+
+  filtered.forEach((item, index) => {
+  const card = document.createElement("div");
+  card.className = "material-card";
+
+  const bestLabel = item.best ? '<div class="best-label">BEST</div>' : '';
+  const basicLabel = item.basic ? '<div class="basic-label">기본형</div>' : '';
+
+let priceHTML = "";
+if (isAdmin) {
+  priceHTML += `
+    <div>
+      <span id="priceText-${index}">${parseInt(item.price).toLocaleString()}원</span>
+      <button onclick="toggleEditPrice('art', ${index})" style="margin-left:4px; border:none; background:none; cursor:pointer;">✎</button>
+    </div>
+  `;
+}
+
+const editBox = `
+  <div class="price-edit-box" id="editBox-art-${index}" style="display:none; margin-top:6px;">
+    <input type="number" id="editInput-art-${index}" style="width:80px;" />
+    <button onclick="saveEditedPrice('art', ${index})">저장</button>
+  </div>
+`;
+
+  card.innerHTML = `
+    ${bestLabel}
+    ${basicLabel}
+    <img src="${item.img1}" alt="${item.name}" onclick="showImageModal('${item.img1}')" style="cursor: zoom-in;" />
+    <div><strong>${item.name}</strong></div>
+    ${priceHTML}
+    ${editBox}
+    <button onclick="setUnitPriceFromMaterial(${item.price}, \`${item.name}\`, \`${item.img1}\`, 'art')">추가</button>
+${isAdmin ? `<button onclick="toggleBestLabel(\`${item.category}\`, \`${item.name}\`)">⭐ BEST 추가</button>` : ''}
+${isAdmin ? `<button onclick="toggleBasicLabel(\`${item.category}\`, \`${item.name}\`)">📌 기본형 추가</button>` : ''}
   `;
 
-  const item = findItemByName(currentCategory, name);
-  if (item) {
-    document.getElementById(`new-price-${index}`).value = item.price;
-  }
+  container.appendChild(card);
+});
 }
 
-function saveItemPrice(name, index) {
-  const input = document.getElementById(`new-price-${index}`);
-  const newPrice = parseInt(input.value);
-  const item = findItemByName(currentCategory, name);
+function loadEtcMaterials(category, containerId) {
+  const filtered = allMaterials.filter(item => item.category === category);
+  // ✅ BEST 먼저 오도록 정렬
+  filtered.sort((a, b) => {
+    const aBest = a.best === "Y" || a.best === true;
+    const bBest = b.best === "Y" || b.best === true;
+    return (bBest ? 1 : 0) - (aBest ? 1 : 0);
+  });
 
-  if (!isNaN(newPrice) && newPrice > 0 && item) {
-    item.price = newPrice;
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
 
-    fetch(SHEETS_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        category: currentCategory,
-        name: item.name,
-        price: newPrice,
-        img1: item.img1,
-        img2: item.img2
-      }),
-      mode: "no-cors"
-    })
-    .then(() => {
-      alert("가격이 수정 요청되었습니다!");
-      fetchMaterials();
-    })
-    .catch(() => {
-      alert("가격 수정 실패!");
-    });
+  filtered.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "material-card";
 
-    showItems(currentCategory);
-  } else {
-    alert("올바른 가격을 입력해주세요.");
-  }
-}
+  const bestLabel = item.best ? '<div class="best-label">BEST</div>' : '';
+  const basicLabel = item.basic ? '<div class="basic-label">기본형</div>' : '';
 
-function findItemByName(category, name) {
-  return (materials[category] || []).find(i => i.name === name);
-}
+    let priceHTML = `
+      <div>
+        <span id="priceText-etc-${index}">${parseInt(item.price).toLocaleString()}원</span>
+    `;
 
-  function addMaterial() {
-    const name = document.getElementById("adminName").value;
-    const price = parseInt(document.getElementById("adminPrice").value);
-    const file1 = document.getElementById("adminImgFile1").files[0];
-    const file2 = document.getElementById("adminImgFile2").files[0];
-
-    if (!name || !price || !file1 || !currentCategory) {
-      alert("필수 항목을 모두 입력해주세요! (이미지1은 필수)");
-      return;
+    if (isAdmin) {
+      priceHTML += `
+        <button onclick="toggleEditPrice('etc', ${index})" style="margin-left:4px; border:none; background:none; cursor:pointer;">✎</button>
+      `;
     }
 
-    const reader1 = new FileReader();
-    const reader2 = new FileReader();
+    priceHTML += `</div>`;
 
-    reader1.onload = function (e1) {
-      const img1 = e1.target.result;
+    const editBox = `
+      <div class="price-edit-box" id="editBox-etc-${index}" style="display:none; margin-top:6px;">
+        <input type="number" id="editInput-etc-${index}" style="width:80px;" />
+        <button onclick="saveEditedPrice('etc', ${index})">저장</button>
+      </div>
+    `;
 
-      if (!file2) {
-        const img2 = img1;
-        submitMaterial(img1, img2);
-      } else {
-        reader2.onload = function (e2) {
-          const img2 = e2.target.result;
-          submitMaterial(img1, img2);
-        };
-        reader2.readAsDataURL(file2);
-      }
+    card.innerHTML = `
+    ${bestLabel}
+    ${basicLabel}
+      <img src="${item.img1}" alt="${item.name}" onclick="showImageModal('${item.img1}')" style="cursor: zoom-in;" />
+      <div><strong>${item.name}</strong></div>
+      ${priceHTML}
+      ${editBox}
+      <button onclick="addCustomEtcToEstimate(\`${item.name}\`)">추가</button>
+${isAdmin ? `<button onclick="toggleBestLabel(\`${item.category}\`, \`${item.name}\`)">⭐ BEST 추가</button>` : ''}
+${isAdmin ? `<button onclick="toggleBasicLabel(\`${item.category}\`, \`${item.name}\`)">📌 기본형 추가</button>` : ''}
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function loadPanelMaterials(part, category) {
+  const targetId = part === "upper" ? "upperMaterialList" : "lowerMaterialList";
+  const container = document.getElementById(targetId);
+  container.innerHTML = "";
+
+  const filtered = allMaterials.filter(item => item.category === category);
+
+// ✅ BEST 우선 정렬
+filtered.sort((a, b) => {
+  const aBest = a.best === "Y" || a.best === true;
+  const bBest = b.best === "Y" || b.best === true;
+  return (bBest ? 1 : 0) - (aBest ? 1 : 0);
+});
+
+  filtered.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "material-card";
+
+  const bestLabel = item.best ? '<div class="best-label">BEST</div>' : '';
+  const basicLabel = item.basic ? '<div class="basic-label">기본형</div>' : '';
+
+    let priceHTML = "";
+    if (isAdmin) {
+      priceHTML += `
+        <div>
+          <span id="priceText-${part}-${index}">${parseInt(item.price).toLocaleString()}원</span>
+          <button onclick="toggleEditPrice('${part}', ${index})" style="margin-left:4px; border:none; background:none; cursor:pointer;">✎</button>
+        </div>
+      `;
+    }
+
+    const editBox = `
+      <div class="price-edit-box" id="editBox-${part}-${index}" style="display:none; margin-top:6px;">
+        <input type="number" id="editInput-${part}-${index}" style="width:80px;" />
+        <button onclick="saveEditedPrice('${part}', ${index})">저장</button>
+      </div>
+    `;
+
+    card.innerHTML = `
+    ${bestLabel}
+    ${basicLabel}
+      <img src="${item.img1}" alt="${item.name}" onclick="showImageModal('${item.img1}')" style="cursor: zoom-in;" />
+      <div><strong>${item.name}</strong></div>
+      ${priceHTML}
+      ${editBox}
+      <button onclick="setUnitPriceFromMaterial(${item.price}, \`${item.name}\`, \`${item.img1}\`, '${part}')">추가</button>
+${isAdmin ? `<button onclick="toggleBestLabel(\`${item.category}\`, \`${item.name}\`)">⭐ BEST 추가</button>` : ''}
+${isAdmin ? `<button onclick="toggleBasicLabel(\`${item.category}\`, \`${item.name}\`)">📌 기본형 추가</button>` : ''}
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function editMaterialPrice(index) {
+  const newPrice = prompt("새 가격을 입력하세요:");
+  if (!newPrice || isNaN(newPrice)) {
+    alert("유효한 숫자를 입력하세요.");
+    return;
+  }
+
+  const price = parseInt(newPrice);
+  const item = allMaterials.filter(item => item.category === currentCategory)[index];
+  item.price = price;
+
+  // 서버에도 업데이트
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "updateMaterialPrice",
+      category: item.category,
+      name: item.name,
+      price: price
+    })
+  })
+  .then(res => res.text())
+  .then(msg => {
+    alert("가격 수정 완료");
+    loadArtificialMaterials(); // 다시 렌더링
+  });
+}
+function uploadMaterial() {
+  const category = currentCategory;
+  const name = document.querySelector('#adminPanel input[type="text"]').value;
+  const price = document.querySelector('#adminPanel input[type="number"]').value;
+  const img1 = document.querySelectorAll('#adminPanel input[type="file"]')[0].files[0];
+  const img2 = document.querySelectorAll('#adminPanel input[type="file"]')[1].files[0];
+
+  if (!category || !name || !price || !img1) {
+    alert("카테고리, 자재 이름, 가격, 이미지1은 필수입니다.");
+    return;
+  }
+
+  const reader1 = new FileReader();
+  const reader2 = new FileReader();
+
+  reader1.onload = function (e1) {
+    if (img2) {
+      reader2.onload = function (e2) {
+        sendMaterialData(e1.target.result, e2.target.result);
+      };
+      reader2.readAsDataURL(img2);
+    } else {
+      // 이미지2가 없으면 이미지1으로 대체
+      sendMaterialData(e1.target.result, e1.target.result);
+    }
+  };
+  reader1.readAsDataURL(img1);
+
+  function sendMaterialData(image1, image2) {
+    const body = {
+      type: "material",
+      category,
+      name,
+      price,
+      img1: image1,
+      img2: image2,
+      best: false,
+      basic: false
     };
-    reader1.readAsDataURL(file1);
-  }
 
-  function submitMaterial(img1, img2) {
-    const name = document.getElementById("adminName").value;
-    const price = parseInt(document.getElementById("adminPrice").value);
-
-    fetch(SHEETS_API_URL, {
+    fetch(SCRIPT_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ category: currentCategory, name, price, img1, img2 }),
-      mode: "no-cors"
-    }).then(() => {
-      alert("자재가 성공적으로 추가되었습니다!");
-      document.getElementById("adminName").value = "";
-      document.getElementById("adminPrice").value = "";
-      document.getElementById("adminImgFile1").value = "";
-      document.getElementById("adminImgFile2").value = "";
-      fetchMaterials().then(() => showItems(currentCategory));
-    });
+      body: JSON.stringify(body)
+    })
+      .then(res => res.text())
+      .then(msg => {
+        alert(msg);
+        if (category.startsWith("인조대리석상판")) loadArtificialMaterials();
+      });
+  }
+}
+
+function setUnitPriceFromMaterial(price, name, img, part) {
+  selectedMaterialName = name; // ✅ 자재명 저장
+
+  if (part === "art") {
+    document.getElementById("artUnitPriceInput").value = price;
+    const preview = document.getElementById("selectedMaterialPreview");
+    preview.innerHTML = `
+      <div class="material-preview-box">
+        <img src="${img}" alt="${name}" />
+        <strong>${name}</strong>
+      </div>
+    `;
+    document.getElementById("artificialShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${name}`;
+  } else if (part === "upper") {
+    document.getElementById("upperUnitPriceInput").value = price;
+    document.getElementById("upperShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${name}`;
+  } else if (part === "lower") {
+    document.getElementById("lowerUnitPriceInput").value = price;
+    document.getElementById("lowerShapeTitle").textContent = `형태 선택 (${currentSubCategory}) - ${name}`;
+  }
+}
+
+function saveEditedPrice(part, index) {
+  const input = document.getElementById(`editInput-${part}-${index}`);
+  const newPrice = parseInt(input.value);
+  if (isNaN(newPrice)) {
+    alert("유효한 숫자를 입력하세요.");
+    return;
   }
 
-  function closeModal(event) {
-    if (event.target.id === 'imageModal' || event.target.tagName === 'BUTTON') {
-      document.getElementById('imageModal').style.display = 'none';
-      document.getElementById('modalImage').src = '';
-    modalImages = [];
-    modalIndex = 0;
+  const filtered = allMaterials.filter(i => i.category === currentCategory);
+  const item = filtered[index];
+  item.price = newPrice;
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "updateMaterialPrice",
+      category: item.category,
+      name: item.name,
+      price: newPrice
+    })
+  })
+  .then(res => res.text())
+  .then(() => {
+    if (part === "art") {
+      loadArtificialMaterials();  // ✅ 인조대리석은 이걸로 다시 렌더링
+    } else {
+      loadPanelMaterials(part, item.category);
     }
+  });
+}
+function showImageModal(src) {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImage");
+  modalImg.src = src;
+  modal.style.display = "flex";
+}
+
+function closeImageModal() {
+  document.getElementById("imageModal").style.display = "none";
+}
+
+function toggleEditPrice(part, index) {
+  const box = document.getElementById(`editBox-${part}-${index}`);
+  const input = document.getElementById(`editInput-${part}-${index}`);
+
+  if (!box || !input) return; // 🔐 요소가 없으면 중단
+
+  if (box.style.display === "none") {
+    box.style.display = "flex";
+    input.value = "";
+  } else {
+    box.style.display = "none";
+  }
+}
+
+function updateTotalCost() {
+  const estimateItems = document.querySelectorAll("#estimateList strong");
+  let total = 0;
+
+  estimateItems.forEach(el => {
+    const num = parseInt(el.textContent.replace(/[^\d]/g, ""));
+    if (!isNaN(num)) total += num;
+  });
+
+  document.getElementById("totalCost").textContent = total.toLocaleString();
+}
+
+function addLowerSizeOnly() {
+  const inputs = document.querySelectorAll("#lowerSizeInputs input");
+  let totalMM = 0;
+  inputs.forEach(input => {
+    const val = parseFloat(input.value);
+    if (!isNaN(val)) totalMM += val;
+  });
+
+  if (totalMM === 0) return alert("길이를 입력하세요.");
+
+  const totalM = totalMM / 1000;
+  const unitPrice = parseFloat(document.getElementById("lowerUnitPriceInput").value) || unitPrices[lowerCategory] || 0;
+  const totalCost = Math.round(totalM * unitPrice);
+
+  const selectedShape = document.querySelector(`input[name="lowerShape"]:checked`);
+  const shapeLabel = selectedShape ? selectedShape.parentElement.textContent.trim() : "형태 미선택";
+
+  const nameToShow = selectedMaterialName || "미선택"; // ✅ 자재명이 없을 경우 대비
+
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${shapeLabel} ${lowerCategory} ${nameToShow} / 총길이 ${totalMM}mm = <strong>${totalCost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()"
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+
+  document.getElementById("estimateList").appendChild(item);
+  updateTotalCost();
+
+  // ✅ 입력값 초기화
+  document.querySelectorAll("#lowerSizeInputs input").forEach(input => input.value = "");
+}
+
+function addLowerSidePanelsOnly() {
+  const qty600 = parseFloat(document.getElementById("lowerSide600Input").value);
+  const qtyCustom = parseFloat(document.getElementById("lowerSideCustomInput").value);
+  const baseCat = lowerCategory;
+  const list = document.getElementById("estimateList");
+
+  let text = "";
+
+  if (!isNaN(qty600) && qty600 > 0) {
+    const unit = sidePanelPrices[baseCat]?.["600"] || 0;
+    const cost = unit * qty600;
+    text += `600측판 ${qty600}개 = <strong>${cost.toLocaleString()}원</strong>`;
   }
 
-  window.onload = fetchMaterials;
-  let modalImages = [];
-  let modalIndex = 0;
-
-  function openModal(img1, img2) {
-    if (!img2 || img2 === "undefined") img2 = img1;
-    modalImages = [img1, img2];
-    modalIndex = 0;
-    showModalImage();
-    document.getElementById('imageModal').style.display = 'flex';
-// 화살표 클릭 이벤트 연결
-  document.getElementById('prevBtn').onclick = (e) => {
-    e.stopPropagation();
-    modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length;
-    showModalImage();
-  };
-
-  document.getElementById('nextBtn').onclick = (e) => {
-    e.stopPropagation();
-    modalIndex = (modalIndex + 1) % modalImages.length;
-    showModalImage();
-  };
+  if (!isNaN(qtyCustom) && qtyCustom > 0) {
+    const unit = sidePanelPrices[baseCat]?.["비규격"] || 0;
+    const cost = unit * qtyCustom;
+    if (text !== "") text += "<br>";
+    text += `비규격측판 ${qtyCustom}개 = <strong>${cost.toLocaleString()}원</strong>`;
   }
 
-  function showModalImage() {
-    document.getElementById('modalImage').src = modalImages[modalIndex];
+  if (text === "") {
+    alert("600측판 또는 비규격측판 개수를 입력하세요.");
+    return;
   }
 
-function markAsBest(category, name) {
-  const item = materials[category].find(i => i.name === name);
-  if (!item) return;
+  const item = document.createElement("div");
+  item.innerHTML = text.split('<br>').map(line => `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${line}</span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
+    </div>
+  `).join('');
+  list.appendChild(item);
+  updateTotalCost();
 
-  item.isBest = true; // 로컬 상태 먼저 반영
-
-  fetch(SHEETS_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      category,
-      name,
-      price: item.price,
-      img1: item.img1,
-      img2: item.img2,
-      isBest: true // Google Sheet에 TRUE로 저장
-    }),
-    mode: "no-cors"
-  }).then(() => {
-    alert("BEST로 등록되었습니다!");
-    fetchMaterials().then(() => showItems(currentCategory)); // 최신 데이터 반영
-  });
+  // ✅ 입력값 초기화
+  document.getElementById("lowerSide600Input").value = "";
+  document.getElementById("lowerSideCustomInput").value = "";
 }
-function unmarkAsBest(category, name) {
-  const item = materials[category].find(i => i.name === name);
-  if (!item) return;
 
-  item.isBest = false;
+function addLowerDrawerOnly() {
+  const drawerVal = parseFloat(document.getElementById("drawerInput").value);
+  if (isNaN(drawerVal) || drawerVal <= 0) return alert("서랍장 길이를 입력하세요.");
 
-  fetch(SHEETS_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      category,
-      name,
-      price: item.price,
-      img1: item.img1,
-      img2: item.img2,
-      isBest: false
-    }),
-    mode: "no-cors"
-  }).then(() => {
-    alert("BEST가 해제되었습니다!");
-    fetchMaterials().then(() => showItems(currentCategory));
-  });
-}
-function markAsBasic(category, name) {
-  const item = materials[category].find(i => i.name === name);
-  if (!item) return;
+  const drawerM = drawerVal / 1000;
+  let drawerCost = Math.round(drawerM * 150000 * 1.3);
 
-  item.isBasic = true;
+  const isBall = document.getElementById("ballRail").checked;
+  const isUnder = document.getElementById("underRail").checked;
+  const isTwoTier = document.getElementById("twoTier").checked;
+  const isThreeTier = document.getElementById("threeTier").checked;
 
-  fetch(SHEETS_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      category,
-      name,
-      price: item.price,
-      img1: item.img1,
-      img2: item.img2,
-      isBasic: true
-    }),
-    mode: "no-cors"
-  }).then(() => {
-    alert("기본형으로 등록되었습니다!");
-    fetchMaterials().then(() => showItems(currentCategory));
+  if (isUnder) {
+    if (isTwoTier) drawerCost += 40000;
+    if (isThreeTier) drawerCost += 60000;
+  }
+
+  let railText = "";
+  if (isTwoTier) railText += " (2단)";
+  if (isThreeTier) railText += " (3단)";
+  if (isBall) railText += " (볼레일)";
+  if (isUnder) railText += " (언더레일)";
+
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>서랍장 ${drawerVal}mm${railText} = <strong>${drawerCost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+  document.getElementById("estimateList").appendChild(item);
+  updateTotalCost();
+
+  // ✅ 입력값 초기화
+  document.getElementById("drawerInput").value = "";
+  ["twoTier", "threeTier", "ballRail", "underRail"].forEach(id => {
+    document.getElementById(id).checked = false;
   });
 }
 
-function unmarkAsBasic(category, name) {
-  const item = materials[category].find(i => i.name === name);
-  if (!item) return;
+function addLowerRiceBoxOnly() {
+  const riceVal = parseFloat(document.getElementById("riceBoxInput").value);
+  if (isNaN(riceVal) || riceVal <= 0) return alert("밥솥장 길이를 입력하세요.");
 
-  item.isBasic = false;
+  const riceM = riceVal / 1000;
+  let riceCost = Math.round(riceM * 150000 * 1.5);
 
-  fetch(SHEETS_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      category,
-      name,
-      price: item.price,
-      img1: item.img1,
-      img2: item.img2,
-      isBasic: false
-    }),
-    mode: "no-cors"
-  }).then(() => {
-    alert("기본형이 해제되었습니다!");
-    fetchMaterials().then(() => showItems(currentCategory));
+  const isRiceUnder = document.getElementById("riceUnderRail").checked;
+  if (isRiceUnder) riceCost += 20000;
+
+  let riceRailText = "";
+  if (document.getElementById("riceBallRail").checked) riceRailText = " (볼레일)";
+  if (isRiceUnder) riceRailText = " (언더레일)";
+
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>하부장 밥솥장 ${riceVal}mm${riceRailText} = <strong>${riceCost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+  document.getElementById("estimateList").appendChild(item);
+  updateTotalCost();
+
+// ✅ 입력값 초기화
+document.getElementById("riceBoxInput").value = "";
+["riceBallRail", "riceUnderRail"].forEach(id => {
+  document.getElementById(id).checked = false;
+});
+}
+
+function addUpperSizeOnly() {
+  const inputs = document.querySelectorAll("#upperSizeInputs input");
+  let totalMM = 0;
+  inputs.forEach(input => {
+    const val = parseFloat(input.value);
+    if (!isNaN(val)) totalMM += val;
+  });
+
+  if (totalMM === 0) return alert("길이를 입력하세요.");
+
+  const totalM = totalMM / 1000;
+  const unitPrice = parseFloat(document.getElementById("upperUnitPriceInput").value) || unitPrices[upperCategory] || 0;
+  const totalCost = Math.round(totalM * unitPrice);
+
+  const selectedShape = document.querySelector(`input[name="upperShape"]:checked`);
+  const shapeLabel = selectedShape ? selectedShape.parentElement.textContent.trim() : "형태 미선택";
+
+  const nameToShow = selectedMaterialName || "미선택"; // ✅ 여기서 자재명 설정
+
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${shapeLabel} ${upperCategory} ${nameToShow} / 총길이 ${totalMM}mm = <strong>${totalCost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+
+  document.getElementById("estimateList").appendChild(item);
+  updateTotalCost();
+
+  // ✅ 입력값 초기화
+  document.querySelectorAll("#upperSizeInputs input").forEach(input => input.value = "");
+  ["riceBallRail", "riceUnderRail"].forEach(id => {
+    document.getElementById(id).checked = false;
   });
 }
 
+function addUpperSideCustomOnly() {
+  const qty600 = parseFloat(document.getElementById("upperSide600Input").value);
+  const qtyCustom = parseFloat(document.getElementById("upperSideCustomInput").value);
+
+  const baseCat = upperCategory;
+  const list = document.getElementById("estimateList");
+
+  let text = "";
+
+  if (!isNaN(qty600) && qty600 > 0) {
+    const unit = sidePanelPrices[baseCat]?.["600"] || 0;
+    const cost = unit * qty600;
+    text += `600측판 ${qty600}개 = <strong>${cost.toLocaleString()}원</strong>`;
+  }
+
+  if (!isNaN(qtyCustom) && qtyCustom > 0) {
+    const unit = sidePanelPrices[baseCat]?.["비규격"] || 0;
+    const cost = unit * qtyCustom;
+    if (text !== "") text += "<br>";
+    text += `비규격측판 ${qtyCustom}개 = <strong>${cost.toLocaleString()}원</strong>`;
+  }
+
+  if (text === "") {
+    alert("600측판 또는 비규격측판 개수를 입력하세요.");
+    return;
+  }
+
+  const item = document.createElement("div");
+  item.innerHTML = text.split('<br>').map(line => `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${line}</span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>
+  `).join('');
+  
+  list.appendChild(item);
+  updateTotalCost();
+
+  // ✅ 입력값 초기화
+  document.getElementById("upperSide600Input").value = "";
+  document.getElementById("upperSideCustomInput").value = "";
+}
+
+function addUpperLightingOnly() {
+  const checked = document.getElementById("upperLightingCheckbox").checked;
+  if (!checked) return alert("체크박스를 먼저 선택하세요.");
+
+  const cost = 150000;
+
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>상부장 간접조명 = <strong>${cost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+        X
+      </button>
+    </div>`;
+  document.getElementById("estimateList").appendChild(item);
+  updateTotalCost();
+
+// ✅ 입력값 초기화
+  document.getElementById("upperLightingCheckbox").checked = false;
+}
+
+function addFridgeToEstimate() {
+  const length = parseFloat(document.getElementById("fridgeLength").value);
+  const count = parseFloat(document.getElementById("fridgeCount").value);
+  const sideCount = parseFloat(document.getElementById("fridgeSideCount").value);
+
+  if (isNaN(length) || length <= 0 || isNaN(count) || count <= 0) {
+    alert("길이와 개수를 올바르게 입력하세요.");
+    return;
+  }
+
+  // 조건에 따른 단가
+  const unitPrice = (length <= 600) ? 150000 : 195000;
+  const sideUnitPrice = 80000;
+
+  const bodyCost = count * unitPrice;
+  const sideCost = (!isNaN(sideCount) && sideCount > 0) ? sideCount * sideUnitPrice : 0;
+  const totalCost = bodyCost + sideCost;
+
+  // ✅ 견적서에는 냉장고장만 표시 (측판 언급 없이 총액만 표시)
+  const text = `냉장고장 ${length}mm × ${count}개 = <strong>${totalCost.toLocaleString()}원</strong>`;
+
+  const list = document.getElementById("estimateList");
+  const item = document.createElement("div");
+  item.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${text}</span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
+    </div>
+  `;
+  list.appendChild(item);
+  updateTotalCost();
+}
+function addCustomEtcToEstimate(name) {
+  const item = allMaterials.find(i => i.category === currentCategory && i.name === name);
+  const cost = item ? parseInt(item.price) : 100000;  // 없으면 100000 예비값
+  const list = document.getElementById("estimateList");
+
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>${name} = <strong>${cost.toLocaleString()}원</strong></span>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
+    </div>
+  `;
+  list.appendChild(div);
+  updateTotalCost();
+}
+
+function toggleBestLabel(category, name) {
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "toggleBest",
+      category,
+      name
+    })
+  })
+  .then(res => res.text())
+  .then(msg => {
+    alert(msg);
+    // 자재 목록 다시 불러오기
+    if (currentMainCategory === "인조대리석상판") {
+      loadArtificialMaterials();
+    } else if (currentMainCategory === "상부장") {
+      loadPanelMaterials("upper", currentCategory);
+    } else if (currentMainCategory === "하부장") {
+      loadPanelMaterials("lower", currentCategory);
+    } else {
+      loadEtcMaterials(currentCategory, `etcMaterialList-${currentSubCategory}`);
+    }
+  });
+}
+
+function toggleBasicLabel(category, name) {
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "toggleBasic",
+      category,
+      name
+    })
+  })
+  .then(res => res.text())
+  .then(msg => {
+    alert(msg);
+    // 자재 목록 다시 불러오기
+    if (currentMainCategory === "인조대리석상판") {
+      loadArtificialMaterials();
+    } else if (currentMainCategory === "상부장") {
+      loadPanelMaterials("upper", currentCategory);
+    } else if (currentMainCategory === "하부장") {
+      loadPanelMaterials("lower", currentCategory);
+    } else {
+      loadEtcMaterials(currentCategory, `etcMaterialList-${currentSubCategory}`);
+    }
+  });
+}
   </script>
-
-  <div class="admin" id="adminPanel">
-    <h3>🔧 관리자 모드</h3>
-    <label>현재 카테고리: <span id="currentCategoryText">-</span></label>
-    <label>자재 이름: <input type="text" id="adminName" /></label>
-    <label>가격: <input type="number" id="adminPrice" /></label>
-    <label>이미지 1: <input type="file" id="adminImgFile1" accept="image/*" /></label>
-    <label>이미지 2: <input type="file" id="adminImgFile2" accept="image/*" /></label>
-    <button onclick="addMaterial()">자재 추가하기</button>
-    <button onclick="closeAdmin()">관리자 모드 닫기</button>
-  </div>
+<!-- ✅ 이미지 모달 with 닫기 버튼 -->
+<div id="imageModal" style="
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+">
+  <button onclick="closeImageModal()" style="
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 28px;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+  ">✕</button>
+  <img id="modalImage" src="" style="max-width: 90%; max-height: 90%; border: 6px solid white; border-radius: 8px;" />
+</div>
 
 </body>
 </html>
