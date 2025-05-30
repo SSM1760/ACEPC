@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -57,6 +56,11 @@
 h3 {
   text-align: center;
   margin-top: 0;
+}
+
+h4 {
+  margin: 0;
+  padding: 0;
 }
 
     .admin-button {
@@ -289,7 +293,7 @@ max-width: 300px;
 
   .panel.right {
     width: 100%;
-    order: 999;
+    order: 3;
   }
 
   .material-grid {
@@ -335,11 +339,9 @@ max-width: 300px;
 
   <!-- ✅ 추가 카테고리 -->
   <div class="category-group">
-    <div class="category-item" onclick="selectCategory('기타', '600후드')">600후드</div>
-    <div class="category-item" onclick="selectCategory('기타', '900후드')">900후드</div>
+    <div class="category-item" onclick="selectCategory('기타', '후드')">후드</div>
     <div class="category-item" onclick="selectCategory('기타', '싱크볼')">싱크볼</div>
     <div class="category-item" onclick="selectCategory('기타', '싱크수전')">싱크수전</div>
-    <div class="category-item" onclick="selectCategory('기타', '통후드')">통후드</div>
   <div class="category-item" onclick="selectCategory('기타', '쿡탑')">쿡탑</div>
   <div class="category-item" onclick="selectCategory('기타', '콘센트')">콘센트</div>
 </div>
@@ -871,8 +873,8 @@ else if (main === "기타" && sub === "냉장고장") {
   }
 }
 
-// ✅ 여기에 600후드/900후드/싱크볼/싱크수전 처리 추가
-else if (["600후드", "900후드", "싱크볼", "싱크수전", "통후드", "쿡탑", "콘센트"].includes(sub)) {
+// ✅ 여기에 후드/900후드/싱크볼/싱크수전 처리 추가
+else if (["후드", "900후드", "싱크볼", "싱크수전", "쿡탑", "콘센트"].includes(sub)) {
   // 기존 패널 숨기기
   document.getElementById("artificialTopSection").style.display = "none";
   document.getElementById("artificialTopSection").classList.remove("full-width");
@@ -881,12 +883,19 @@ else if (["600후드", "900후드", "싱크볼", "싱크수전", "통후드", "�
   document.getElementById("upperFormSection").style.display = "none";
   document.getElementById("lowerFormSection").style.display = "none";
 
-  // 다른 custom 패널 숨기기
-document.querySelectorAll(".flex-row > .panel").forEach(panel => {
-  if (panel.id.startsWith("customEtcPanel") && panel.id !== `customEtcPanel-${sub}`) {
-    panel.style.display = "none";
-  }
-});
+  // ✅ 여기에 추가: 키큰장/냉장고장 패널 숨기기
+  const keyPanel = document.getElementById("customKeyPanel");
+  if (keyPanel) keyPanel.style.display = "none";
+
+  const fridgePanel = document.getElementById("customFridgePanel");
+  if (fridgePanel) fridgePanel.style.display = "none";
+
+  // 이후 기존 기타 패널 숨기기 (이 코드는 기존대로 유지)
+  document.querySelectorAll(".flex-row > .panel").forEach(panel => {
+    if (panel.id.startsWith("customEtcPanel") && panel.id !== `customEtcPanel-${sub}`) {
+      panel.style.display = "none";
+    }
+  });
 
   const flexRow = document.querySelector(".flex-row");
   let etcPanel = document.getElementById(`customEtcPanel-${sub}`);
@@ -897,15 +906,15 @@ document.querySelectorAll(".flex-row > .panel").forEach(panel => {
   newPanel.id = `customEtcPanel-${sub}`;
   newPanel.style.flex = "1"; // ✅ 여기가 핵심
   newPanel.innerHTML = `
-    <h3>자재 목록 (${sub})</h3>
-    <div id="etcMaterialList-${sub}" class="material-grid"></div>
-  `;
+  <h3>자재 목록 (${sub})</h3>
+  <div id="etcMaterialList-${sub}"></div>
+`;
   flexRow.insertBefore(newPanel, document.querySelector(".panel.right"));
 } else {
   etcPanel.innerHTML = `
-    <h3>자재 목록 (${sub})</h3>
-    <div id="etcMaterialList-${sub}" class="material-grid"></div>
-  `;
+  <h3>자재 목록 (${sub})</h3>
+  <div id="etcMaterialList-${sub}"></div>
+`;
   etcPanel.style.display = "block";
   etcPanel.style.flex = "1"; // ✅ 재사용 시도 반영
 }
@@ -991,7 +1000,9 @@ else if (part === "art") category = currentCategory;
   }
 
   const totalCost = Math.round(totalLengthM * unitPrice);
-  let text = `${shapeLabel} ${category} / 총길이 ${totalLengthMM}mm = <strong>${totalCost.toLocaleString()}원</strong>`;
+  const nameToShow = selectedMaterialName || "미선택";
+
+  let text = `${shapeLabel} ${category} ${nameToShow} / 총길이 ${totalLengthMM}mm = <strong>${totalCost.toLocaleString()}원</strong>`;
 
 // ✅ 인조대리석에는 측판 없음 → upper/lower일 때만 처리
 if (part === "upper" || part === "lower") {
@@ -1061,19 +1072,50 @@ if (part === "upper" || part === "lower") {
     }
   }
 
-  const list = document.getElementById("estimateList");
-  const item = document.createElement("div");
-  const lines = text.split('<br>');
-  item.innerHTML = lines.map(line => `
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <span>${line}</span>
-      <button onclick="this.parentElement.remove(); updateTotalCost()"
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
-    </div>
-  `).join('');
-  list.appendChild(item);
+let list;
+
+if (part === "upper") {
+  if (part === "upper") {
+  let sectionId = "estimate-upper";
+  let section = document.getElementById(sectionId);
+
+  if (!section) {
+    section = document.createElement("div");
+    section.id = sectionId;
+    section.innerHTML = `
+      <h4>상부장</h4>
+      <div class="estimate-category-list"></div>
+      <hr>
+    `;
+    insertSectionInOrder(section);
+  }
+
+  list = section.querySelector(".estimate-category-list");
+}
+} else if (part === "lower") {
+  list = getOrCreateLowerSection();
+} else if (part === "art") {
+  list = getOrCreateArtSection();
+} else if (currentMainCategory === "기타" && currentSubCategory === "키큰장") {
+  list = document.querySelector("#estimate-key .estimate-category-list");
+} else if (currentMainCategory === "기타" && currentSubCategory === "냉장고장") {
+  list = document.querySelector("#estimate-fridge .estimate-category-list");
+} else {
+  list = document.getElementById("estimateList");  // 혹시 예외 대비해서 임시 보관
+}
+
+const item = document.createElement("div");
+const lines = text.split('<br>');
+item.innerHTML = lines.map(line => `
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span>${line}</span>
+    <button onclick="this.parentElement.remove(); updateTotalCost()"
+      style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
+      X
+    </button>
+  </div>
+`).join('');
+list.appendChild(item);
 
   updateTotalCost(); // ✅ 총액 갱신
 
@@ -1200,8 +1242,14 @@ ${isAdmin ? `<button onclick="toggleBasicLabel(\`${item.category}\`, \`${item.na
 
 function loadEtcMaterials(category, containerId) {
   const filtered = allMaterials.filter(item => item.category === category);
-  // ✅ BEST 먼저 오도록 정렬
+
   filtered.sort((a, b) => {
+    let prefixA = a.name.includes("(") ? a.name.split("(")[0].trim() : "";
+    let prefixB = b.name.includes("(") ? b.name.split("(")[0].trim() : "";
+
+    if (prefixA < prefixB) return -1;
+    if (prefixA > prefixB) return 1;
+
     const aBest = a.best === "Y" || a.best === true;
     const bBest = b.best === "Y" || b.best === true;
     return (bBest ? 1 : 0) - (aBest ? 1 : 0);
@@ -1210,12 +1258,35 @@ function loadEtcMaterials(category, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
 
-  filtered.forEach((item, index) => {
+  let currentSection = "";
+
+filtered.forEach((item, index) => {
+  // ✅ 이름에서 prefix 추출
+  let prefix = "기타";
+  if (item.name.includes("(")) {
+    prefix = item.name.split("(")[0].trim();
+  }
+
+  // ✅ 구분선 + 새로운 grid 만들어주기
+  if (currentSection !== prefix) {
+    const divider = document.createElement("div");
+    divider.innerHTML = `<h4 style="margin: 16px 0;">${prefix}</h4>`;
+    container.appendChild(divider);
+
+    const grid = document.createElement("div");
+    grid.className = "material-grid";
+    grid.id = `grid-${prefix}`;
+    container.appendChild(grid);
+
+    currentSection = prefix;
+  }
+
+    // ✅ 자재 카드 생성 (기존 카드 생성 로직 유지)
     const card = document.createElement("div");
     card.className = "material-card";
 
-  const bestLabel = item.best ? '<div class="best-label">BEST</div>' : '';
-  const basicLabel = item.basic ? '<div class="basic-label">기본형</div>' : '';
+    const bestLabel = item.best ? '<div class="best-label">BEST</div>' : '';
+    const basicLabel = item.basic ? '<div class="basic-label">기본형</div>' : '';
 
     let priceHTML = `
       <div>
@@ -1249,8 +1320,8 @@ ${isAdmin ? `<button onclick="toggleBestLabel(\`${item.category}\`, \`${item.nam
 ${isAdmin ? `<button onclick="toggleBasicLabel(\`${item.category}\`, \`${item.name}\`)">📌 기본형 추가</button>` : ''}
     `;
 
-    container.appendChild(card);
-  });
+    document.getElementById(`grid-${prefix}`).appendChild(card);
+});
 }
 
 function loadPanelMaterials(part, category) {
@@ -1463,6 +1534,24 @@ function toggleEditPrice(part, index) {
   }
 }
 
+function getOrCreateUpperSection() {
+  let sectionId = "estimate-upper";
+  let section = document.getElementById(sectionId);
+
+  if (!section) {
+    section = document.createElement("div");
+    section.id = sectionId;
+    section.innerHTML = `
+      <h4>상부장</h4>
+      <div class="estimate-category-list"></div>
+      <hr>
+    `;
+    document.getElementById("estimateList").appendChild(section);
+  }
+
+  return section.querySelector(".estimate-category-list");
+}
+
 function updateTotalCost() {
   const estimateItems = document.querySelectorAll("#estimateList strong");
   let total = 0;
@@ -1473,6 +1562,42 @@ function updateTotalCost() {
   });
 
   document.getElementById("totalCost").textContent = total.toLocaleString();
+}
+
+function getOrCreateLowerSection() {
+  let sectionId = "estimate-lower";
+  let section = document.getElementById(sectionId);
+
+  if (!section) {
+    section = document.createElement("div");
+    section.id = sectionId;
+    section.innerHTML = `
+      <h4>하부장</h4>
+      <div class="estimate-category-list"></div>
+      <hr>
+    `;
+    insertSectionInOrder(section);
+  }
+
+  return section.querySelector(".estimate-category-list");
+}
+
+function getOrCreateArtSection() {
+  let sectionId = "estimate-artificial";
+  let section = document.getElementById(sectionId);
+
+  if (!section) {
+    section = document.createElement("div");
+    section.id = sectionId;
+    section.innerHTML = `
+      <h4>인조대리석 상판</h4>
+      <div class="estimate-category-list"></div>
+      <hr>
+    `;
+    insertSectionInOrder(section);
+  }
+
+  return section.querySelector(".estimate-category-list");
 }
 
 function addLowerSizeOnly() {
@@ -1492,22 +1617,20 @@ function addLowerSizeOnly() {
   const selectedShape = document.querySelector(`input[name="lowerShape"]:checked`);
   const shapeLabel = selectedShape ? selectedShape.parentElement.textContent.trim() : "형태 미선택";
 
-  const nameToShow = selectedMaterialName || "미선택"; // ✅ 자재명이 없을 경우 대비
+  const nameToShow = selectedMaterialName || "미선택";
 
   const item = document.createElement("div");
   item.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>${shapeLabel} ${lowerCategory} ${nameToShow} / 총길이 ${totalMM}mm = <strong>${totalCost.toLocaleString()}원</strong></span>
-      <button onclick="this.parentElement.remove(); updateTotalCost()"
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+      <button onclick="this.parentElement.remove(); updateTotalCost()" 
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>`;
 
-  document.getElementById("estimateList").appendChild(item);
+  const list = getOrCreateLowerSection();
+  list.appendChild(item);
   updateTotalCost();
 
-  // ✅ 입력값 초기화
   document.querySelectorAll("#lowerSizeInputs input").forEach(input => input.value = "");
 }
 
@@ -1515,7 +1638,6 @@ function addLowerSidePanelsOnly() {
   const qty600 = parseFloat(document.getElementById("lowerSide600Input").value);
   const qtyCustom = parseFloat(document.getElementById("lowerSideCustomInput").value);
   const baseCat = lowerCategory;
-  const list = document.getElementById("estimateList");
 
   let text = "";
 
@@ -1545,10 +1667,11 @@ function addLowerSidePanelsOnly() {
         style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>
   `).join('');
+
+  const list = getOrCreateLowerSection();
   list.appendChild(item);
   updateTotalCost();
 
-  // ✅ 입력값 초기화
   document.getElementById("lowerSide600Input").value = "";
   document.getElementById("lowerSideCustomInput").value = "";
 }
@@ -1581,14 +1704,13 @@ function addLowerDrawerOnly() {
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>서랍장 ${drawerVal}mm${railText} = <strong>${drawerCost.toLocaleString()}원</strong></span>
       <button onclick="this.parentElement.remove(); updateTotalCost()" 
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>`;
-  document.getElementById("estimateList").appendChild(item);
+
+  const list = getOrCreateLowerSection();
+  list.appendChild(item);
   updateTotalCost();
 
-  // ✅ 입력값 초기화
   document.getElementById("drawerInput").value = "";
   ["twoTier", "threeTier", "ballRail", "underRail"].forEach(id => {
     document.getElementById(id).checked = false;
@@ -1614,18 +1736,17 @@ function addLowerRiceBoxOnly() {
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>하부장 밥솥장 ${riceVal}mm${riceRailText} = <strong>${riceCost.toLocaleString()}원</strong></span>
       <button onclick="this.parentElement.remove(); updateTotalCost()" 
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>`;
-  document.getElementById("estimateList").appendChild(item);
+
+  const list = getOrCreateLowerSection();
+  list.appendChild(item);
   updateTotalCost();
 
-// ✅ 입력값 초기화
-document.getElementById("riceBoxInput").value = "";
-["riceBallRail", "riceUnderRail"].forEach(id => {
-  document.getElementById(id).checked = false;
-});
+  document.getElementById("riceBoxInput").value = "";
+  ["riceBallRail", "riceUnderRail"].forEach(id => {
+    document.getElementById(id).checked = false;
+  });
 }
 
 function addUpperSizeOnly() {
@@ -1645,34 +1766,26 @@ function addUpperSizeOnly() {
   const selectedShape = document.querySelector(`input[name="upperShape"]:checked`);
   const shapeLabel = selectedShape ? selectedShape.parentElement.textContent.trim() : "형태 미선택";
 
-  const nameToShow = selectedMaterialName || "미선택"; // ✅ 여기서 자재명 설정
+  const nameToShow = selectedMaterialName || "미선택";
 
   const item = document.createElement("div");
   item.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>${shapeLabel} ${upperCategory} ${nameToShow} / 총길이 ${totalMM}mm = <strong>${totalCost.toLocaleString()}원</strong></span>
       <button onclick="this.parentElement.remove(); updateTotalCost()" 
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>`;
 
-  document.getElementById("estimateList").appendChild(item);
+  const list = getOrCreateUpperSection();
+  list.appendChild(item);
   updateTotalCost();
-
-  // ✅ 입력값 초기화
   document.querySelectorAll("#upperSizeInputs input").forEach(input => input.value = "");
-  ["riceBallRail", "riceUnderRail"].forEach(id => {
-    document.getElementById(id).checked = false;
-  });
 }
 
 function addUpperSideCustomOnly() {
   const qty600 = parseFloat(document.getElementById("upperSide600Input").value);
   const qtyCustom = parseFloat(document.getElementById("upperSideCustomInput").value);
-
   const baseCat = upperCategory;
-  const list = document.getElementById("estimateList");
 
   let text = "";
 
@@ -1699,16 +1812,14 @@ function addUpperSideCustomOnly() {
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>${line}</span>
       <button onclick="this.parentElement.remove(); updateTotalCost()" 
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>
   `).join('');
-  
+
+  const list = getOrCreateUpperSection();
   list.appendChild(item);
   updateTotalCost();
 
-  // ✅ 입력값 초기화
   document.getElementById("upperSide600Input").value = "";
   document.getElementById("upperSideCustomInput").value = "";
 }
@@ -1718,20 +1829,18 @@ function addUpperLightingOnly() {
   if (!checked) return alert("체크박스를 먼저 선택하세요.");
 
   const cost = 150000;
-
   const item = document.createElement("div");
   item.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span>상부장 간접조명 = <strong>${cost.toLocaleString()}원</strong></span>
       <button onclick="this.parentElement.remove(); updateTotalCost()" 
-        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">
-        X
-      </button>
+        style="background:#888; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer;">X</button>
     </div>`;
-  document.getElementById("estimateList").appendChild(item);
+
+  const list = getOrCreateUpperSection();
+  list.appendChild(item);
   updateTotalCost();
 
-// ✅ 입력값 초기화
   document.getElementById("upperLightingCheckbox").checked = false;
 }
 
@@ -1833,6 +1942,25 @@ function toggleBasicLabel(category, name) {
       loadEtcMaterials(currentCategory, `etcMaterialList-${currentSubCategory}`);
     }
   });
+}
+function insertSectionInOrder(section) {
+  const estimateList = document.getElementById("estimateList");
+
+  const upperSection = document.getElementById("estimate-upper");
+  const lowerSection = document.getElementById("estimate-lower");
+  const artSection = document.getElementById("estimate-artificial");
+
+  if (section.id === "estimate-upper") {
+    estimateList.insertBefore(section, upperSection || lowerSection || artSection || null);
+  } else if (section.id === "estimate-lower") {
+    if (artSection) {
+      estimateList.insertBefore(section, artSection);
+    } else {
+      estimateList.appendChild(section);
+    }
+  } else if (section.id === "estimate-artificial") {
+    estimateList.appendChild(section);
+  }
 }
   </script>
 <!-- ✅ 이미지 모달 with 닫기 버튼 -->
