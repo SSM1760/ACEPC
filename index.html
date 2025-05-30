@@ -540,6 +540,9 @@ max-width: 300px;
 </div>
 <button onclick="clearEstimate()" ...
 <button onclick="clearEstimate()" style="margin-top:10px; background:#c00; color:white; padding:6px 10px; border:none; border-radius:4px; cursor:pointer;">전체 삭제</button>
+<button onclick="summarizeEstimate()" style="margin-top:10px; background:#007bff; color:white; padding:6px 10px; border:none; border-radius:4px; cursor:pointer;">정리</button>
+
+<div id="summaryBox" style="margin-top:10px; border:1px solid #ddd; padding:10px; border-radius:8px; min-height:80px; background:#fafafa;"></div>
 <div id="adminPanel" class="admin-panel" style="display: none;">
   <h4>🔧 관리자 모드</h4>
 
@@ -1562,6 +1565,31 @@ function updateTotalCost() {
   });
 
   document.getElementById("totalCost").textContent = total.toLocaleString();
+}
+
+function summarizeEstimate() {
+  const items = document.querySelectorAll("#estimateList span");
+  const nameCount = {};
+
+  items.forEach(span => {
+    let name = span.textContent.split("=")[0].trim();
+    if (nameCount[name]) {
+      nameCount[name]++;
+    } else {
+      nameCount[name] = 1;
+    }
+  });
+
+  let result = "";
+  for (const name in nameCount) {
+    if (nameCount[name] === 1) {
+      result += `${name}\n`;
+    } else {
+      result += `${name} ${nameCount[name]}EA\n`;
+    }
+  }
+
+  document.getElementById("summaryBox").textContent = result.trim();
 }
 
 function getOrCreateLowerSection() {
